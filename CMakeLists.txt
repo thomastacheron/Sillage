@@ -23,10 +23,10 @@ include_directories(${CODAC_INCLUDE_DIRS})
 ################################################################################
 # Looking for IPE-Generator
 ################################################################################
-find_package(ipegenerator REQUIRED)
-message(STATUS "Found ipegenerator")
-include_directories(${IPEGENERATOR_INCLUDE_DIRS})
-set(LIBS ${IPEGENERATOR_LIBRARIES} ${LIBS})
+# find_package(ipegenerator REQUIRED)
+# message(STATUS "Found ipegenerator")
+# include_directories(${IPEGENERATOR_INCLUDE_DIRS})
+# set(LIBS ${IPEGENERATOR_LIBRARIES} ${LIBS})
 
 ################################################################################
 # Looking for Eigen
@@ -38,5 +38,4 @@ include_directories(${EIGEN3_INCLUDE_DIRS})
 # Compile sources
 ################################################################################
 add_executable(test src/main.cpp)
-# target_include_directories(test ${IPEGENERATOR_INCLUDE_DIRS})
-target_link_libraries(test ${IPEGENERATOR_LIBRARIES} ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES})
+target_link_libraries(test ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES})
