@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.20)
 project(WakeBoat)
 
 # Settings
@@ -35,7 +35,13 @@ find_package(Eigen3 REQUIRED NO_MODULE)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
 ################################################################################
+# Looking for FMT
+################################################################################
+find_package(fmt REQUIRED)
+include_directories(${fmt_INCLUDE_DIRS})
+
+################################################################################
 # Compile sources
 ################################################################################
 add_executable(test src/main.cpp)
-target_link_libraries(test ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES})
+target_link_libraries(test ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)

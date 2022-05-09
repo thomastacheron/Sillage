@@ -16,21 +16,21 @@ int main(int argc, char *argv[]) {
     // Boats
     std::vector<Boat> boats;
     Boat b1(0, 5, 1);
-    Boat b2(20, 7, -1);
+    // Boat b2(20, 7, -1);
     boats.push_back(b1);
-    boats.push_back(b2);
+    // boats.push_back(b2);
 
     // Sensors
     std::vector<Sensor> sensors;
-    Sensor s1(5, 0);
-    Sensor s2(10, 10);
+    Sensor s1(10, 0);
+    // Sensor s2(10, 10);
     sensors.push_back(s1);
-    sensors.push_back(s2);
+    // sensors.push_back(s2);
 
     // Scene
     codac::IntervalVector X0(3);
-    X0[0] = codac::Interval(0., 100.);
-    X0[1] = codac::Interval(0., 100.);
+    X0[0] = codac::Interval(-5, 25.);
+    X0[1] = codac::Interval(-5, 15.);
     X0[2] = codac::Interval(-10., 10.);
     Scene scene(sensors, boats, X0);
 

@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <string>
+#include <fmt/core.h>
 
 #include "sensor.hpp"
 #include "boat.hpp"
@@ -32,34 +34,29 @@ class Scene {
 void Scene::process() {
     for (auto &s : m_sensors) {
         for (const auto &b: m_boats) {
-            float t = 1 / b.V() * ((b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) + s.X() - b.X());
+            float t = 1 / b.V() * ((b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) + b.X() - s.X());
             codac::Interval I(t);
-            I.inflate(0.1);
+            I.inflate(0.5);
             s.t.push_back(I);
         }
     }
 }
 
 void Scene::solve(double precision) {
-    ibex::Function f_plus("dx", "dy", "v", "1/v*(dy/0.761-dx)");
-    ibex::Function f_moins("dx", "dy", "v", "1/v*(-dy/0.761-dx)");
-    codac::Interval y = m_sensors[0].t[0];
-    std::cout << y << std::endl;
-
+    
     ibex::Array<ibex::Sep> a(0);
     std::vector<std::shared_ptr<ibex::Sep>> vec(m_boats.size() * m_sensors.size());
-    
-    codac::Interval t = m_sensors[0].t[0];
 
     // for (auto const &s : m_sensors) {
     //     for (auto const &t : s.t) {
-            codac::Interval v_plus(0.5, 1.5);
-            codac::Interval v_moins(-1.5, -0.5);
-            ibex::SepFwdBwd S_f_plus(f_plus, t);
-            ibex::SepFwdBwd S_f_moins(f_moins, t);
-            codac::SepProj S_plus(S_f_plus, v_plus, 10*precision);
-            codac::SepProj S_moins(S_f_moins, v_moins, 10*precision);
-            std::shared_ptr<ibex::Sep> U = std::make_shared<ibex::SepUnion>(S_plus, S_moins);
+            std::string function = fmt::format("(y-{1})/((x-{0})-v*t)", m_sensors[0].X(), m_sensors[0].Y());
+            ibex::Function f("x", "y", "v", "t", function.c_str());
+            ibex::SepFwdBwd S_f(f, -Interval(0.3, 0.4));
+            codac::IntervalVector y(2);
+            y[0] = m_X[2];
+            y[1] = m_sensors[0].t[0];
+            std::cout << y << std::endl;
+            std::shared_ptr<codac::SepProj> U = std::make_shared<codac::SepProj>(S_f, m_X[2], 10*precision);
             vec.push_back(U);
             a.add(*U);
     //     }
@@ -75,7 +72,8 @@ void Scene::solve(double precision) {
     }
 
     for (auto const &b : m_boats) {
-        double rot = (b.V() > 0) ? 0 : 180;
-        vibes::drawAUV(b.X(), b.Y(), rot, 2, "black[yellow]");
+        vibes::drawPoint(b.X(), b.Y(), 5, "black[blue]");
+        // double rot = (b.V() > 0) ? 0 : 180;
+        // vibes::drawAUV(b.X(), b.Y(), rot, 2, "black[yellow]");
     }
 }
