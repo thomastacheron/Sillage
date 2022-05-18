@@ -19,6 +19,7 @@ message(STATUS "Found IBEX version ${IBEX_VERSION}")
 find_package(CODAC REQUIRED)
 message(STATUS "Found Codac version ${CODAC_VERSION}")
 include_directories(${CODAC_INCLUDE_DIRS})
+message(STATUS "Codac Include dirs ${CODAC_INCLUDE_DIRS}")
 
 ################################################################################
 # Looking for IPE-Generator

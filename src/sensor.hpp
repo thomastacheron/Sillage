@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include <string>
 
 #include <codac.h>
@@ -9,18 +10,26 @@
 
 class Sensor {
     public:
-        Sensor(float x, float y) : m_x(x), m_y(y) {};
+        inline Sensor(float x, float y);
         std::vector<codac::Interval> t;
 
         inline float X() const { return m_x; };
         inline float Y() const { return m_y; };
 
         void save(std::string filename);
+        std::shared_ptr<ibex::Function> f;
 
     private:
         float m_x = 0;
         float m_y = 0;
 };
+
+inline Sensor::Sensor(float x, float y) {
+    m_x = x;
+    m_y = y;
+    std::string function = fmt::format("abs(y-{1})/{2}-(x-{0})", m_x, m_y, tan(19.5 * M_PI / 180.));
+    f = std::make_shared<ibex::Function>("x", "y", function.c_str());
+}
 
 inline void Sensor::save(std::string filename) {
     // ibex::IntervalVector frame_data(2, ibex::Interval::EMPTY_SET);
