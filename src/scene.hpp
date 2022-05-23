@@ -17,6 +17,33 @@
 #include <ibex/ibex_SepUnion.h>
 #include <ibex/ibex_SepInverse.h>
 
+void drawBoat(double cx = 0, double cy = 0, double theta = 0, double scale = 0, std::string params = "") {
+    std::vector<double> x;
+    std::vector<double> y;
+    int n = 20;
+    double angle = M_PI_4;
+    for (int k=0; k<=n; ++k) {
+        x.push_back(cos(M_PI_2 - k*angle/n));
+        y.push_back(sin(M_PI_2 - k*angle/n) - sin(angle));
+    }
+    for (int k=0; k<=n; ++k) {
+        x.push_back(cos((n-k)*angle/n - M_PI_2));
+        y.push_back(sin((n-k)*angle/n - M_PI_2) + sin(angle));
+    }
+    x.push_back(-0.5);
+    y.push_back(-1+sin(angle));
+    x.push_back(-0.5);
+    y.push_back(1-sin(angle));
+
+    std::vector<double> px;
+    std::vector<double> py;
+    for (int k=0; k<x.size(); ++k) {
+        px.push_back(scale * (cos(theta) * x[k] + sin(theta) * y[k]) + cx);
+        py.push_back(scale * (sin(theta) * x[k] + cos(theta) * y[k]) + cy);
+    }
+    vibes::drawPolygon(px, py, params);
+}
+
 
 class Scene {
     public:
@@ -73,7 +100,7 @@ void Scene::process() {
             // Detection Interval
             double t = 1 / b.V() * (abs(b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
-            I.inflate(0.25);
+            I.inflate(0.5);
             s.t.push_back(I);
 
             // SepBox
@@ -163,12 +190,15 @@ void Scene::solve(double t, double precision, std::string filename) {
 
     // Showing boats
     for (auto const &b : m_boats) {
-        double rot = (b.V() > 0) ? 0 : 180;
-        vibes::drawAUV(b.X(), b.Y(), rot, 1, "black[yellow]");
+        double rot = (b.V() > 0) ? 0 : M_PI;
+        drawBoat(b.X(), b.Y(), rot, 1, "black[#34495e]");
+        drawBoat(b.X()+b.V()*t, b.Y(), rot, 1, "black[yellow]");
     }
 
     // Saving the figure
     if (filename.size() > 0) {
+        vibes::setFigureProperties("Wake", vibesParams("x", 600, "y", 260, "width", int(500*m_X[0].diam()/m_X[1].diam()), "height", 500));
+        vibes::axisLimits(m_X[0].lb(), m_X[0].ub(), m_X[1].lb(), m_X[1].ub());
         vibes::saveImage(filename, "Wake");
     }
 }
