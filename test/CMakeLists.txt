@@ -1,5 +1,5 @@
 # Tests folders
-set(TEST_FILES 01-forward 02-backward)
+set(TEST_FILES 01-forward 02-backward 03-detection_space 04-complex 05-video)
 
 # Generating executables
 foreach(file IN LISTS TEST_FILES)

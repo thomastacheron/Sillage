@@ -53,6 +53,6 @@ int main(int argc, char *argv[]) {
     // Scene
     Scene scene(sensors, boats, X0);
 
-    scene.detection_space(0.01);
+    scene.detection_space(0, 1, 0.01, true);
     scene.solve(0.1);
 }

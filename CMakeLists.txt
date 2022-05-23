@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(WakeBoat)
 
 # Settings
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
@@ -44,7 +44,7 @@ include_directories(${fmt_INCLUDE_DIRS})
 ################################################################################
 # Compile sources
 ################################################################################
-add_executable(main src/main.cpp)
-target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
+# add_executable(main src/main.cpp)
+# target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
 
 add_subdirectory(test)

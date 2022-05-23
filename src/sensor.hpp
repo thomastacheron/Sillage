@@ -6,6 +6,7 @@
 
 #include <codac.h>
 #include <codac/vibes.h>
+#include <ibex/ibex_SepUnion.h>
 
 
 class Sensor {
@@ -19,6 +20,11 @@ class Sensor {
         void save(std::string filename);
         std::shared_ptr<ibex::Function> f;
 
+        // Separator
+        std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
+        std::shared_ptr<ibex::Array<ibex::Sep>> ArraySepBox;
+        std::shared_ptr<ibex::SepUnion> sep;
+
     private:
         float m_x = 0;
         float m_y = 0;
@@ -29,6 +35,8 @@ inline Sensor::Sensor(float x, float y) {
     m_y = y;
     std::string function = fmt::format("abs(y-{1})/{2}-(x-{0})", m_x, m_y, tan(19.5 * M_PI / 180.));
     f = std::make_shared<ibex::Function>("x", "y", function.c_str());
+    ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>(0);
+    sep = nullptr;
 }
 
 inline void Sensor::save(std::string filename) {

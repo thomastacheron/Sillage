@@ -18,16 +18,14 @@ int main(int argc, char *argv[]) {
     Boat b1(0, 0, 2);
     boats.push_back(b1);
 
-    // Sensor
+    // Sensors
     std::vector<Sensor> sensors;
-    Sensor s(2, 0);
-    sensors.push_back(s);
+    Sensor s1(2, 0);
+    sensors.push_back(s1);
+    Sensor s2(4, 3);
+    sensors.push_back(s2);
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.solve(0, 0.1, "01-forward.png");
-
-    // Detection Time
-    Sensor sensor = scene.get_sensors()[0];
-    std::cout << "Detection Time : " << sensor.t[0] << std::endl;
+    scene.detection_space(0, 1, true);
 }

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <codac.h>
 
@@ -23,6 +24,10 @@ int main(int argc, char *argv[]) {
     sensors.push_back(s);
 
     // Scene
-    Scene scene(sensors, boats, X0);
-    scene.solve(0.1, true, "02-backward.png");
+    Scene scene(X0, sensors, boats);
+    scene.solve(0, 0.1, "02-backward.png");
+
+    // Detection Time
+    Sensor sensor = scene.get_sensors()[0];
+    std::cout << "Detection Time : " << sensor.t[0] << std::endl;
 }
