@@ -44,5 +44,7 @@ include_directories(${fmt_INCLUDE_DIRS})
 ################################################################################
 # Compile sources
 ################################################################################
-add_executable(test src/main.cpp)
-target_link_libraries(test ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
+add_executable(main src/main.cpp)
+target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
+
+add_subdirectory(test)

@@ -21,25 +21,41 @@
 class Scene {
     public:
         Scene(std::vector<Sensor> sensors, std::vector<Boat> boats, codac::IntervalVector X0) : m_boats(boats), m_sensors(sensors), m_X(X0) {};
-
-        inline void process();
+        
         inline void solve(double precision = 1);
         inline void detection_space(double precision = 1);
+
+        inline void set_sensors(std::vector<Sensor> sensors);
+        inline void set_boats(std::vector<Boat> boats);
+
+    private:
+        codac::IntervalVector m_X;
 
         std::vector<Boat> m_boats;
         std::vector<Sensor> m_sensors;
 
-    private:
-        codac::IntervalVector m_X;
+        bool m_dirty = true;
+
+        inline void process();
 };
 
 // Implementation
+void Scene::set_sensors(std::vector<Sensor> sensors) {
+    m_dirty = true;
+    m_sensors = sensors;
+}
+
+void Scene::set_boats(std::vector<Boat> boats) {
+    m_dirty = true;
+    m_boats = boats;
+}
+
 void Scene::process() {
     for (auto &s : m_sensors) {
         for (const auto &b: m_boats) {
-            float t = 1 / b.V() * ((b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
+            double t = 1 / b.V() * (abs(b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
-            I.inflate(1);
+            I.inflate(0.25);
             s.t.push_back(I);
         }
     }
@@ -51,13 +67,17 @@ void Scene::detection_space(double precision) {
         return;
     }
 
+    if (m_dirty) {
+        process();
+    }
+
     IntervalVector window (IntervalVector::empty(2));
 
     std::vector<std::shared_ptr<ibex::Sep>> vec;
     std::vector<std::shared_ptr<ibex::Array<ibex::Sep>>> vec_u;
     ibex::Array<ibex::Sep> cp(0);
 
-    for(auto s = std::begin(m_sensors); s < std::begin(m_sensors) + 2; ++s) {
+    for(auto s = std::begin(m_sensors); s < std::begin(m_sensors)+2; ++s) {
         auto u = std::make_shared<ibex::Array<ibex::Sep>>(0);
         for (const auto &i : s->t) {
             window[std::distance(m_sensors.begin(), s)] |= i;
@@ -75,13 +95,22 @@ void Scene::detection_space(double precision) {
 
     vibes::beginDrawing();
     vibes::newFigure("Detection Space");
-    window.inflate(2);
-    codac::SIVIA(window, Scp, precision);
     vibes::setFigureProperties("Detection Space", vibesParams("x", 100, "y", 300, "width", 500, "height", 500));
     vibes::axisLimits(window[0].lb(), window[0].ub(), window[1].lb(), window[1].ub());
+    window.inflate(2);
+    codac::SIVIA(window, Scp, precision);
+    for (const auto &b: m_boats) {
+        double t1 = 1 / b.V() * (abs(b.Y() - m_sensors[0].Y()) / tan(19.5 * M_PI / 180.) - (b.X() - m_sensors[0].X()));
+        double t2 = 1 / b.V() * (abs(b.Y() - m_sensors[1].Y()) / tan(19.5 * M_PI / 180.) - (b.X() - m_sensors[1].X()));
+        vibes::drawCircle(t1, t2, 0.15, "black[red]");
+    }
 }
 
 void Scene::solve(double precision) {
+
+    if (m_dirty) {
+        process();
+    }
 
     std::vector<std::shared_ptr<ibex::Sep>> vec;
     std::vector<std::shared_ptr<ibex::Array<ibex::Sep>>> vec_u;
@@ -103,7 +132,7 @@ void Scene::solve(double precision) {
 
     std::string function = "(";
     for (const Sensor &s: m_sensors) {
-        std::string fi = fmt::format("1/v*((abs(y)-{1})/{2}-(x-{0}));", s.X(), s.Y(), tan(19.5 * M_PI / 180.));
+        std::string fi = fmt::format("1/v*(abs(y-{1})/{2}-(x-{0}));", s.X(), s.Y(), tan(19.5 * M_PI / 180.));
         function += fi;
     }
     function.at(function.size() - 1) = ')';
@@ -112,12 +141,12 @@ void Scene::solve(double precision) {
     ibex::Function f("x", "y", "v", function.c_str());
     ibex::SepInverse Si(Scp, f);
 
-    codac::SepProj Sp(Si, IntervalVector(Interval(0.5, 1.5)), 0.01);
+    codac::SepProj Sp(Si, IntervalVector(m_X[2]), precision);
 
     vibes::beginDrawing();
     vibes::newFigure("Wake");
     codac::IntervalVector X = m_X.subvector(0, 1);
-    codac::SIVIA(X, Sp, 0.1*precision);
+    codac::SIVIA(X, Sp, precision);
 
     for (auto const &s : m_sensors) {
         vibes::drawPoint(s.X(), s.Y(), 5, "black[red]");
