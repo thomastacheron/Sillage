@@ -93,33 +93,15 @@ void Scene::detection_space(std::size_t i1, std::size_t i2, double precision, bo
 
     // View window
     IntervalVector window (IntervalVector::empty(2));
-
-    // Variable holder
-    std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
-
-    // Sensor 1
-    ibex::Array<ibex::Sep> SepBox1(0);
     for (const auto &i: m_sensors[i1].t) {
         window[0] |= i;
-        auto Sbi = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
-        SepBoxes.push_back(Sbi);
-        SepBox1.add(*Sbi);
     }
-    ibex::SepUnion Su1(SepBox1);
-
-    // Sensor 2
-    ibex::Array<ibex::Sep> SepBox2(0);
     for (const auto &i: m_sensors[i2].t) {
         window[1] |= i;
-        auto Sbi = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
-        SepBoxes.push_back(Sbi);
-        SepBox2.add(*Sbi);
     }
-    ibex::SepUnion Su2(SepBox2);
 
     // Cartesian product of detections
-    ibex::Array<ibex::Sep> CartProd{*(m_sensors[i1].sep), *(m_sensors[i1].sep)};
-    codac::SepCartProd Scp(CartProd);
+    codac::SepCartProd Scp(*(m_sensors[i1].sep), *(m_sensors[i2].sep));
 
     // Graphics
     window.inflate(2);
@@ -144,35 +126,26 @@ void Scene::solve(double t, double precision, std::string filename) {
         process();
     }
 
-    std::vector<std::shared_ptr<ibex::Sep>> vec;
-    std::vector<std::shared_ptr<ibex::Array<ibex::Sep>>> vec_u;
+    // Cartesian product between detected times
     ibex::Array<ibex::Sep> cp(0);
-
     for(const Sensor &s: m_sensors) {
-        auto u = std::make_shared<ibex::Array<ibex::Sep>>(0);
-        for (const Interval &i : s.t) {
-            auto Ci = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
-            vec.push_back(Ci);
-            u->add(*Ci);
-        }
-        vec_u.push_back(u);
-        auto Cu = std::make_shared<ibex::SepUnion>(*u); 
-        vec.push_back(Cu);
-        cp.add(*Cu);
+        cp.add(*(s.sep));
     }
     codac::SepCartProd Scp(cp);
 
+    // Function used in set inversion
     std::string function = "(";
     for (const Sensor &s: m_sensors) {
-        std::string fi = fmt::format("1/v*(abs(y-{1})/{2}-(x-{0}));", s.X(), s.Y(), tan(19.5 * M_PI / 180.));
+        std::string fi = fmt::format("1/v*(abs(y-{1})/{2}-(x-{0}))+{3};", s.X(), s.Y(), tan(19.5 * M_PI / 180.), t);
         function += fi;
     }
     function.at(function.size() - 1) = ')';
 
-
+    // Inversion of the separator on sensor's detected times
     ibex::Function f("x", "y", "v", function.c_str());
     ibex::SepInverse Si(Scp, f);
 
+    // Projection of the separator along x and y given a v
     codac::SepProj Sp(Si, IntervalVector(m_X[2]), precision);
 
     // Graphics
@@ -183,15 +156,18 @@ void Scene::solve(double t, double precision, std::string filename) {
     codac::IntervalVector X = m_X.subvector(0, 1);
     codac::SIVIA(X, Sp, precision);
 
+    // Showing sensors
     for (auto const &s : m_sensors) {
         vibes::drawCircle(s.X(), s.Y(), 0.2, "black[red]");
     }
 
+    // Showing boats
     for (auto const &b : m_boats) {
         double rot = (b.V() > 0) ? 0 : 180;
         vibes::drawAUV(b.X(), b.Y(), rot, 1, "black[yellow]");
     }
 
+    // Saving the figure
     if (filename.size() > 0) {
         vibes::saveImage(filename, "Wake");
     }

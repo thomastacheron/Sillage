@@ -23,7 +23,7 @@ class Sensor {
         // Separator
         std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
         std::shared_ptr<ibex::Array<ibex::Sep>> ArraySepBox;
-        std::shared_ptr<ibex::SepUnion> sep;
+        std::shared_ptr<ibex::Sep> sep;
 
     private:
         float m_x = 0;

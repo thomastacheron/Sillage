@@ -15,17 +15,19 @@ int main(int argc, char *argv[]) {
 
     // Boat
     std::vector<Boat> boats;
-    Boat b1(0, 0, 2);
+    Boat b1(3, 4, 1);
+    Boat b2(-4, -2, 3);
     boats.push_back(b1);
+    boats.push_back(b2);
 
     // Sensors
     std::vector<Sensor> sensors;
     Sensor s1(2, 0);
-    sensors.push_back(s1);
     Sensor s2(4, 3);
+    sensors.push_back(s1);
     sensors.push_back(s2);
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.detection_space(0, 1, true);
+    scene.detection_space(0, 1, 0.1, true);
 }
