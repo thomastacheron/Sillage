@@ -24,5 +24,5 @@ int main(int argc, char *argv[]) {
 
     // Scene
     Scene scene(sensors, boats, X0);
-    scene.solve(0.1);
+    scene.solve(0.1, true, "02-backward.png");
 }
