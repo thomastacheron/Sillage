@@ -47,6 +47,23 @@ int main(int argc, char *argv[]) {
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
         std::string filename = fmt::format("data/05-video/Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
-        scene.boat_space(t, precision, filename);
+        #ifdef WITH_VIBES
+            vibes::beginDrawing();
+            codac::VIBesFig fig("Wake");
+            scene.boat_space(fig, t, precision);
+            fig.set_properties(600, 260, int(500*X0[0].diam()/X0[1].diam()), 500);
+            fig.axis_limits(X0.subvector(0, 1));
+            fig.save_image(filename, "png");
+        #endif
+        #ifdef WITH_IPE
+            ipegenerator::Figure fig(X0.subvector(0, 1), 100, 100*X0[1].diam()/X0[0].diam());
+            fig.set_graduation_parameters(X0[0].lb(),5,X0[1].lb(),5);
+            fig.set_number_digits_axis_x(1);
+            fig.set_number_digits_axis_y(1);
+            scene.boat_space(fig, t, precision);
+            fig.draw_axis("x","y");
+            fig.save_ipe(filename + ".ipe");
+            fig.save_pdf(filename + ".pdf");
+        #endif
     }
 }

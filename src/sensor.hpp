@@ -8,6 +8,8 @@
 #include <codac/vibes.h>
 #include <ibex/ibex_SepUnion.h>
 
+#include <fmt/core.h>
+
 
 class Sensor {
     public:

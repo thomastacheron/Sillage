@@ -47,4 +47,7 @@ include_directories(${fmt_INCLUDE_DIRS})
 # add_executable(main src/main.cpp)
 # target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
 
+add_library(wake_boat src/scene.cpp)
+target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} ${IPEGENERATOR_LIBRARIES} fmt::fmt)
+
 add_subdirectory(test)

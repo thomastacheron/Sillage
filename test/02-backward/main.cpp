@@ -25,7 +25,27 @@ int main(int argc, char *argv[]) {
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.boat_space(0, 0.1, "02-backward.png");
+
+    // Figure
+    std::string filename = "02-backward";
+    #ifdef WITH_VIBES
+        vibes::beginDrawing();
+        codac::VIBesFig fig("Wake");
+        scene.boat_space(fig, 0, 0.1);
+        fig.set_properties(600, 260, int(500*X0[0].diam()/X0[1].diam()), 500);
+        fig.axis_limits(X0.subvector(0, 1));
+        fig.save_image(filename, "png");
+    #endif
+    #ifdef WITH_IPE
+        ipegenerator::Figure fig(X0.subvector(0, 1), 100, 100*X0[1].diam()/X0[0].diam());
+        fig.set_graduation_parameters(X0[0].lb(),1,X0[1].lb(),1);
+        fig.set_number_digits_axis_x(1);
+        fig.set_number_digits_axis_y(1);
+        scene.boat_space(fig, 0, 0.1);
+        fig.draw_axis("x","y");
+        fig.save_ipe(filename + ".ipe");
+        fig.save_pdf(filename + ".pdf");
+    #endif
 
     // Detection Time
     Sensor sensor = scene.get_sensors()[0];
