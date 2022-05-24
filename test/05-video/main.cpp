@@ -47,6 +47,6 @@ int main(int argc, char *argv[]) {
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
         std::string filename = fmt::format("data/05-video/Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
-        scene.solve(t, precision, filename);
+        scene.boat_space(t, precision, filename);
     }
 }

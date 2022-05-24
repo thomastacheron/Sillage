@@ -24,10 +24,10 @@ message(STATUS "Codac Include dirs ${CODAC_INCLUDE_DIRS}")
 ################################################################################
 # Looking for IPE-Generator
 ################################################################################
-# find_package(ipegenerator REQUIRED)
-# message(STATUS "Found ipegenerator")
-# include_directories(${IPEGENERATOR_INCLUDE_DIRS})
-# set(LIBS ${IPEGENERATOR_LIBRARIES} ${LIBS})
+find_package(ipegenerator REQUIRED)
+message(STATUS "Found ipegenerator")
+include_directories(${IPEGENERATOR_INCLUDE_DIRS})
+set(LIBS ${IPEGENERATOR_LIBRARIES} ${LIBS})
 
 ################################################################################
 # Looking for Eigen

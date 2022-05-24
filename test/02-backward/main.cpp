@@ -20,12 +20,12 @@ int main(int argc, char *argv[]) {
 
     // Sensor
     std::vector<Sensor> sensors;
-    Sensor s(2, 0);
+    Sensor s(-2, 0);
     sensors.push_back(s);
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.solve(0, 0.1, "02-backward.png");
+    scene.boat_space(0, 0.1, "02-backward.png");
 
     // Detection Time
     Sensor sensor = scene.get_sensors()[0];

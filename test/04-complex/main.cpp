@@ -38,5 +38,5 @@ int main(int argc, char *argv[]) {
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.solve(0, 0.1);
+    scene.boat_space(0, 0.1, "complex", true);
 }

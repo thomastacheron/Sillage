@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     // Scene
     Scene scene(X0, sensors, boats);
-    scene.solve(0, 0.1, "01-forward.png");
+    scene.boat_space(0, 0.1, "01-forward", true);
 
     // Detection Time
     Sensor sensor = scene.get_sensors()[0];
