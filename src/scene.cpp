@@ -15,6 +15,7 @@
 #include <codac/codac_SepBox.h>
 #include <codac/codac_Set.h>
 
+#include <ibex/ibex_Interval.h>
 #include <ibex/ibex_SepUnion.h>
 #include <ibex/ibex_SepInverse.h>
 
@@ -217,10 +218,19 @@ void Scene::solve(double t, double precision) {
     ibex::Function f("x", "y", "v", function.c_str());
     ibex::SepInverse Si(Scp, f);
 
-    // Projection of the separator along x and y given a v
-    codac::SepProj Sp(Si, IntervalVector(m_X[2]), precision);
-
     // Sivia
-    codac::IntervalVector X = m_X.subvector(0, 1);
-    m_M = codac::SIVIA(X, Sp, precision, false, "", true);
+    if (m_X[2].contains(0)) {
+        // Projection of the separator along x and y given a v
+        codac::SepProj Sp_plus(Si, IntervalVector(m_X[2] & codac::Interval(precision, POS_INFINITY)), precision);
+        codac::SepProj Sp_moins(Si, IntervalVector(m_X[2] & codac::Interval(NEG_INFINITY, -precision)), precision);
+        ibex::SepUnion Su(Sp_plus, Sp_moins);
+        // Sivia
+        m_M = codac::SIVIA(m_X.subvector(0, 1), Su, precision, false, "", true);
+    }
+    else {
+        // Projection of the separator along x and y given a v
+        codac::SepProj Sp(Si, IntervalVector(m_X[2]), precision);
+        // Sivia
+        m_M = codac::SIVIA(m_X.subvector(0, 1), Sp, precision, false, "", true);
+    }
 }

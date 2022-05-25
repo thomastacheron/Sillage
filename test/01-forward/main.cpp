@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-5, 5}, {-5, 5}, {1, 5}});
+    codac::IntervalVector X0({{-5, 5}, {-5, 5}, {-2, 5}});
 
     // Boat
     std::vector<Boat> boats;
