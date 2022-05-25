@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     // Boats
     std::vector<Boat> boats;
-    std::vector<std::vector<double>> b_coords{{-15, 5, 3}, {-5, -5, 2}, {2, 5, 4}, {15, 6, 2}, {20, -3, 5}};
+    std::vector<std::vector<double>> b_coords{{-22, 6, 5}, {-20, -3, 3}, {-16, -8, 2}, {-14, 3, 4}, {-12, -1, 2}};
     for (const auto &c: b_coords) {
         Boat b(c[0], c[1], c[2]);
         boats.push_back(b);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Time
-    double tf = 10;
+    double tf = 30;
     double h = 0.1;
     std::vector<double> time(int(tf/h));
     std::generate(time.begin(), time.end(), [n = 0, h] () mutable { return (n++)*h; });
