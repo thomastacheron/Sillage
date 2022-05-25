@@ -158,8 +158,10 @@ void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision) {
     fig.add_layer("boats");
     fig.set_current_layer("boats");
     for (const auto &b: m_boats) {
-        double rot = (b.V() > 0) ? 0 : M_PI;
-        fig.draw_auv(b.X()+b.V()*t, b.Y(), rot, 0.01);
+        if (m_X[0].contains(b.X()+b.V()*t)) {
+            double rot = (b.V() > 0) ? 0 : M_PI;
+            fig.draw_auv(b.X()+b.V()*t, b.Y(), rot, 0.01);
+        }
     }
 }
 
@@ -206,7 +208,7 @@ void Scene::solve(double t, double precision) {
     // Function used in set inversion
     std::string function = "(";
     for (const Sensor &s: m_sensors) {
-        std::string fi = fmt::format("1/v*(abs(y-{1})/{2}-(x-{0}))+{3};", s.X(), s.Y(), tan(19.5 * M_PI / 180.), t);
+        std::string fi = fmt::format("1/v*(sign(v)*abs(y-{1})/{2}-(x-{0}))+{3};", s.X(), s.Y(), tan(19.5 * M_PI / 180.), t);
         function += fi;
     }
     function.at(function.size() - 1) = ')';

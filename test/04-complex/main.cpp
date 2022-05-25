@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {0.1, 5}});
+    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-20, 20}});
 
     // Boats
     std::vector<Boat> boats;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     #endif
     #ifdef WITH_IPE
         ipegenerator::Figure fig(X0.subvector(0, 1), 100, 100*X0[1].diam()/X0[0].diam());
-        fig.set_graduation_parameters(X0[0].lb(),1,X0[1].lb(),1);
+        fig.set_graduation_parameters(X0[0].lb(), 5, X0[1].lb(), 5);
         fig.set_number_digits_axis_x(1);
         fig.set_number_digits_axis_y(1);
         scene.boat_space(fig, 0, 0.1);
