@@ -12,11 +12,11 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-5, 5}, {-5, 5}, {-2, 5}});
+    codac::IntervalVector X0({{-5, 5}, {-5, 5}, {-2, 2}});
 
     // Boat
     std::vector<Boat> boats;
-    Boat b1(0, 0, 2);
+    Boat b1(0, 0, 1);
     boats.push_back(b1);
 
     // Sensor

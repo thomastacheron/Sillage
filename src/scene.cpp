@@ -218,19 +218,23 @@ void Scene::solve(double t, double precision) {
     ibex::Function f("x", "y", "v", function.c_str());
     ibex::SepInverse Si(Scp, f);
 
+    // Projection of the separator along x and y given a v
+    std::vector<std::shared_ptr<ibex::Sep>> refs;
+    ibex::Array<ibex::Sep> a(0);
+    codac::Interval v_p = m_X[2] & codac::Interval(precision, POS_INFINITY);
+    if (!v_p.is_empty()) {
+        auto Sp = std::make_shared<codac::SepProj>(Si, v_p, precision);
+        refs.push_back(Sp);
+        a.add(*Sp);
+    }
+    codac::Interval v_m = m_X[2] & codac::Interval(NEG_INFINITY, -precision);
+    if (!v_m.is_empty()) {
+        auto Sp = std::make_shared<codac::SepProj>(Si, v_m, precision);
+        refs.push_back(Sp);
+        a.add(*Sp);
+    }
+    ibex::SepUnion Su(a);
+
     // Sivia
-    if (m_X[2].contains(0)) {
-        // Projection of the separator along x and y given a v
-        codac::SepProj Sp_plus(Si, IntervalVector(m_X[2] & codac::Interval(precision, POS_INFINITY)), precision);
-        codac::SepProj Sp_moins(Si, IntervalVector(m_X[2] & codac::Interval(NEG_INFINITY, -precision)), precision);
-        ibex::SepUnion Su(Sp_plus, Sp_moins);
-        // Sivia
-        m_M = codac::SIVIA(m_X.subvector(0, 1), Su, precision, false, "", true);
-    }
-    else {
-        // Projection of the separator along x and y given a v
-        codac::SepProj Sp(Si, IntervalVector(m_X[2]), precision);
-        // Sivia
-        m_M = codac::SIVIA(m_X.subvector(0, 1), Sp, precision, false, "", true);
-    }
+    m_M = codac::SIVIA(m_X.subvector(0, 1), Su, precision, false, "", true);
 }

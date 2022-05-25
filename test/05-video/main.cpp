@@ -14,11 +14,11 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {0.1, 5}});
+    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, -1}});
 
     // Boats
     std::vector<Boat> boats;
-    std::vector<std::vector<double>> b_coords{{-22, 6, 5}, {-20, -3, 3}, {-16, -8, 2}, {-14, 3, 4}, {-12, -1, 2}};
+    std::vector<std::vector<double>> b_coords{{-22, 6, 5}, {-20, -3, 3}, {-16, -8, 2}, {-14, 3, 4}, {-12, -1, 2}, {8, -4, -3}, {14, 7, -4}, {20, -7, -2}, {23, 0, -5}};
     for (const auto &c: b_coords) {
         Boat b(c[0], c[1], c[2]);
         boats.push_back(b);
