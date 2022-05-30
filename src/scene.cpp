@@ -72,9 +72,10 @@ std::vector<Boat> Scene::get_boats() {
 
 void Scene::process() {
     for (auto &s : m_sensors) {
+        s.t.clear();
         for (const auto &b: m_boats) {
             // Detection Interval
-            double t = 1 / b.V() * (abs(b.Y() - s.Y()) / tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
+            double t = 1 / std::abs(b.V()) * (std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
             I.inflate(0.5);
             s.t.push_back(I);
@@ -124,6 +125,16 @@ void Scene::detection_space(std::size_t i1, std::size_t i2, double precision, bo
     }
 }
 
+void Scene::draw_sensors(ipegenerator::Figure &fig, float size) {
+    fig.add_layer("sensors");
+    fig.set_current_layer("sensors");
+    fig.set_color_stroke("black");
+    fig.set_color_fill("red");
+    for (const auto &s: m_sensors) {
+        fig.draw_circle(s.X(), s.Y(), size);
+    }
+}
+
 void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision) {
     // Solving the scene
     solve(t, precision);
@@ -144,15 +155,6 @@ void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision) {
     fig.set_current_layer("uncertain");
     for (const auto &iv : m_M[codac::SetValue::UNKNOWN]) {
         fig.draw_box(iv,"colorBlindMaybeStroke","colorBlindMaybeFill");
-    }
-
-    // Sensors
-    fig.add_layer("sensors");
-    fig.set_current_layer("sensors");
-    fig.set_color_stroke("black");
-    fig.set_color_fill("red");
-    for (const auto &s: m_sensors) {
-        fig.draw_circle(s.X(), s.Y(), 0.25);
     }
 
     // Boats

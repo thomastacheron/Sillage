@@ -21,11 +21,14 @@ class Scene {
         
         void detection_space(std::size_t i1, std::size_t i2, double precision = 1, bool show_truth = false, bool use_ipe = false);
 
-        // Boat space with vibes figure
+        // Boat space on vibes figure
         void boat_space(codac::VIBesFig &fig, double t = 0, double precision = 0.1);
 
-        // Boat space with ipe figure
+        // Boat space on ipe figure
         void boat_space(ipegenerator::Figure &fig, double t = 0, double precision = 0.1);
+
+        // Show sensors on ipe figure
+        void draw_sensors(ipegenerator::Figure &fig, float size=0.25);
 
         void set_sensors(const std::vector<Sensor> sensors);
         void set_boats(const std::vector<Boat> boats);
