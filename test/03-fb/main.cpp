@@ -1,9 +1,7 @@
-#include <array>
 #include <iostream>
-#include <random>
 #include <vector>
-
 #include <codac.h>
+#include <ipegenerator/ipegenerator.h>
 
 #include "scene.hpp"
 #include "boat.hpp"
@@ -14,33 +12,33 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 0}});
+    codac::IntervalVector X0({{-10, 10}, {-10, 10}, {-2, 2}});
 
-    // Boats
+    // Boat
     std::vector<Boat> boats;
-    std::vector<std::vector<double>> b_coords{{-15, 5, 3}, {-10, 3, 2}, {2, 5, 4}, {18, 8, 2}, {20, -3, 5}, {16, -6, -3}, {5, 3, -1}, {-3, 0, -4}};
-    for (const auto &c: b_coords) {
-        Boat b(c[0], c[1], c[2]);
-        boats.push_back(b);
-    }
+    Boat b1(-1, 1, 1);
+    Boat b2(2, -5, -1);
+    Boat b3(-1, 3, 1);
+    Boat b4(3, -6, -1);
+    boats.push_back(b1);
+    boats.push_back(b2);
+    boats.push_back(b3);
+    boats.push_back(b4);
 
-    // Sensors
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<double> distribution_x(X0[0].lb(), X0[0].ub());
-    std::uniform_real_distribution<double> distribution_y(X0[1].lb(), X0[1].ub());
-    int n_sensors = 40;
+    // Sensor
     std::vector<Sensor> sensors;
-    for (int i=0; i<n_sensors; ++i) {
-        Sensor s(distribution_x(generator), distribution_y(generator));
-        sensors.push_back(s);
-    }
+    Sensor s1(0, 0);
+    Sensor s2(0, 1);
+    Sensor s3(0, -1);
+    sensors.push_back(s1);
+    sensors.push_back(s2);
+    sensors.push_back(s3);
 
     // Scene
     Scene scene(X0, sensors, boats);
 
     // Figure
-    std::string filename = "04-complex";
+    std::string filename = "03-fb";
     #ifdef WITH_VIBES
         vibes::beginDrawing();
         codac::VIBesFig fig("Wake");
@@ -51,7 +49,7 @@ int main(int argc, char *argv[]) {
     #endif
     #ifdef WITH_IPE
         ipegenerator::Figure fig(X0.subvector(0, 1), 100, 100*X0[1].diam()/X0[0].diam());
-        fig.set_graduation_parameters(X0[0].lb(), 5, X0[1].lb(), 5);
+        fig.set_graduation_parameters(X0[0].lb(),1,X0[1].lb(),1);
         fig.set_number_digits_axis_x(1);
         fig.set_number_digits_axis_y(1);
         scene.boat_space(fig, 0, 0.1);
@@ -59,4 +57,8 @@ int main(int argc, char *argv[]) {
         fig.save_ipe(filename + ".ipe");
         fig.save_pdf(filename + ".pdf");
     #endif
+
+    // Detection Time
+    Sensor sensor = scene.get_sensors()[0];
+    std::cout << "Detection Time : " << sensor.t[0] << std::endl;
 }

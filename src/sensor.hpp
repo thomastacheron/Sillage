@@ -20,7 +20,7 @@ class Sensor {
         inline float Y() const { return m_y; };
 
         void save(std::string filename);
-        std::shared_ptr<ibex::Function> f;
+        std::string function;
 
         // Separator
         std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
@@ -35,8 +35,7 @@ class Sensor {
 inline Sensor::Sensor(float x, float y) {
     m_x = x;
     m_y = y;
-    std::string function = fmt::format("abs(y-{1})/{2}-(x-{0})", m_x, m_y, tan(19.5 * M_PI / 180.));
-    f = std::make_shared<ibex::Function>("x", "y", function.c_str());
+    function = fmt::format("1/v*(sign(v)*abs(y-{1})/{2}-(x-{0}))", m_x, m_y, tan(19.5 * M_PI / 180.));
     ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>(0);
     sep = nullptr;
 }

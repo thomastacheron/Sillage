@@ -209,7 +209,7 @@ void Scene::solve(double t, double precision) {
     // Function used in set inversion
     std::string function = "(";
     for (const Sensor &s: m_sensors) {
-        std::string fi = fmt::format("1/v*(sign(v)*abs(y-{1})/{2}-(x-{0}))+{3};", s.X(), s.Y(), tan(19.5 * M_PI / 180.), t);
+        std::string fi = s.function + fmt::format("+{0};", t);
         function += fi;
     }
     function.at(function.size() - 1) = ')';
