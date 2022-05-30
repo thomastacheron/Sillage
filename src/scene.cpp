@@ -75,7 +75,7 @@ void Scene::process() {
         s.t.clear();
         for (const auto &b: m_boats) {
             // Detection Interval
-            double t = 1 / std::abs(b.V()) * (std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
+            double t = 1 / b.V() * (std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
             I.inflate(0.5);
             s.t.push_back(I);

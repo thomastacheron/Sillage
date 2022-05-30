@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, -1}});
+    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
 
     // Boats
     std::vector<Boat> boats;
@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
             fig.set_number_digits_axis_x(1);
             fig.set_number_digits_axis_y(1);
             scene.boat_space(fig, t, precision);
+            scene.draw_sensors(fig);
             fig.draw_axis("x","y");
             fig.save_ipe(filename + ".ipe");
             fig.save_pdf(filename + ".pdf");

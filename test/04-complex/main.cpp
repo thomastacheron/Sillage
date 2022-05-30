@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     // Frame of the problem
-    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 0}});
+    codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
 
     // Boats
     std::vector<Boat> boats;
