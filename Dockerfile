@@ -1,4 +1,4 @@
-FROM gcc:12
+FROM gcc:12 AS build
 
 RUN apt-get update && apt-get -y install python2.7 flex bison gcc g++ \
     make pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
@@ -7,9 +7,10 @@ RUN apt-get update && apt-get -y install python2.7 flex bison gcc g++ \
 
 # Installing Cmake
 ENV CMAKE_VERSION=3.22
-ENV CMAKE_BUILD=2
-RUN wget https://cmake.org/files/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz && tar -xzvf cmake-$CMAKE_VERSION.$CMAKE_BUILD.tar.gz && cd cmake-$CMAKE_VERSION.$CMAKE_BUILD/ \
-    && ./bootstrap && make -j4 && make install
+ENV CMAKE_BUILD=4
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION.$CMAKE_BUILD/cmake-$CMAKE_VERSION.$CMAKE_BUILD-linux-x86_64.sh -O cmake.sh \
+    && /bin/sh cmake.sh --skip-license
 
 # Installing IBEX
 RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git && cd ibex-lib \
@@ -24,9 +25,12 @@ RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch &&
     && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # WakeBoat
-RUN git clone https://github.com/Teusner/WakeBoat && cd WakeBoat && git submodule init && git submodule update \
-    && mkdir build && cd build && cmake .. -DWITH_IPE=ON && make -j8
+RUN mkdir -p /WakeBoat/build && mkdir /output
+COPY src /WakeBoat/src
+COPY test /WakeBoat/test
+COPY extern /WakeBoat/extern
+COPY CMakeLists.txt /WakeBoat
 
-RUN mkdir /output
+RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON && make -j8
 
 ENTRYPOINT ["/WakeBoat/build/test/05-video", "-p", "/output"]

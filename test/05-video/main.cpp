@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     //     step(scene, X0, t, tf, h, precision, p);
     // }
 
-m    double precision = 0.1;
+    double precision = 0.1;
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
         std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
