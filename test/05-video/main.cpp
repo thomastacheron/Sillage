@@ -11,6 +11,7 @@
 
 #include <cxxopts.hpp>
 #include <filesystem>
+#include <thread>
 
 using namespace std;
 
@@ -36,7 +37,10 @@ int main(int argc, char *argv[]) {
 
         std::exit(EXIT_FAILURE);
     }
-    
+
+    // Number of threads
+    unsigned int n = std::thread::hardware_concurrency();
+    std::cout << n << " concurrent threads are supported.\n";
 
     // Frame of the problem
     codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
