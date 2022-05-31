@@ -2,7 +2,8 @@ FROM gcc:12
 
 RUN apt-get update && apt-get -y install python2.7 flex bison gcc g++ \
     make pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
-    apt-utils libfmt-dev wget --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    apt-utils libfmt-dev wget texlive-latex-base texlive-latex-extra \
+    texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Installing Cmake
 ENV CMAKE_VERSION=3.22
@@ -26,6 +27,6 @@ RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch &&
 RUN git clone https://github.com/Teusner/WakeBoat && cd WakeBoat \
     && mkdir build && cd build && cmake .. -DWITH_IPE=ON && make -j8
 
-RUN apt-get update && apt-get -y install texlive-latex-base texlive-latex-extra texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN mkdir /output
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/WakeBoat/build/test/05-video", "-p", "/output"]

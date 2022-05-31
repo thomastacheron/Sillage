@@ -9,10 +9,35 @@
 #include "boat.hpp"
 #include "sensor.hpp"
 
+#include <cxxopts.hpp>
+#include <filesystem>
+
 using namespace std;
 
 
 int main(int argc, char *argv[]) {
+    // Parsing args
+    cxxopts::Options options("05-video", "Video generation of boat's enclosing state using sensors");
+
+    options.add_options()
+        ("p,path", "Output path", cxxopts::value<std::string>())
+        ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+        ("h,help", "Print usage")
+    ;
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        std::exit(EXIT_SUCCESS);
+    }
+
+    std::filesystem::path p(result["path"].as<std::string>());
+    if (!std::filesystem::is_directory(p)) {
+
+        std::exit(EXIT_FAILURE);
+    }
+    
+
     // Frame of the problem
     codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
 
@@ -46,7 +71,7 @@ int main(int argc, char *argv[]) {
     double precision = 0.1;
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
-        std::string filename = fmt::format("data/05-video/Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
+        std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
         #ifdef WITH_VIBES
             vibes::beginDrawing();
             codac::VIBesFig fig("Wake");
