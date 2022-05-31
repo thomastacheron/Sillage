@@ -96,7 +96,6 @@ int main(int argc, char *argv[]) {
     //     step(scene, X0, t, tf, h, precision, p);
     // }
 
-    Scene
     double precision = 0.1;
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
