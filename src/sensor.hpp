@@ -36,7 +36,7 @@ inline Sensor::Sensor(float x, float y) {
     m_x = x;
     m_y = y;
     function = fmt::format("1/v*(abs(y-{1})/{2}-(x-{0}))", m_x, m_y, tan(19.5 * M_PI / 180.));
-    ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>(0);
+    ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>();
     sep = nullptr;
 }
 
