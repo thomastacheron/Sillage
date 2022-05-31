@@ -24,7 +24,7 @@ RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch &&
     && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # WakeBoat
-RUN git clone https://github.com/Teusner/WakeBoat && cd WakeBoat \
+RUN git clone https://github.com/Teusner/WakeBoat && cd WakeBoat && git submodule init && git submodule update \
     && mkdir build && cd build && cmake .. -DWITH_IPE=ON && make -j8
 
 RUN mkdir /output

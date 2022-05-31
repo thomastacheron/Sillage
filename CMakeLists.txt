@@ -3,8 +3,8 @@ project(WakeBoat)
 
 # Settings
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -pthread")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -pthread")
 
 ################################################################################
 # Looking for IBEX
@@ -45,6 +45,11 @@ include_directories(${fmt_INCLUDE_DIRS})
 # Looking for CXXOPTS
 ################################################################################
 add_subdirectory(extern/cxxopts)
+
+################################################################################
+# Looking for THREADS
+################################################################################
+find_package (Threads)
 
 ################################################################################
 # Compile sources

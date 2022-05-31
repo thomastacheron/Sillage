@@ -15,6 +15,29 @@
 
 using namespace std;
 
+void step(Scene scene, codac::IntervalVector X, double t, double tf, double h, double precision, std::filesystem::path p){
+    std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
+    #ifdef WITH_VIBES
+        vibes::beginDrawing();
+        codac::VIBesFig fig("Wake");
+        scene.boat_space(fig, t, precision);
+        fig.set_properties(600, 260, int(500*X[0].diam()/X[1].diam()), 500);
+        fig.axis_limits(X.subvector(0, 1));
+        fig.save_image(filename, "png");
+    #endif
+    #ifdef WITH_IPE
+        ipegenerator::Figure fig(X.subvector(0, 1), 100, 100*X[1].diam()/X[0].diam());
+        fig.set_graduation_parameters(X[0].lb(),5,X[1].lb(),5);
+        fig.set_number_digits_axis_x(1);
+        fig.set_number_digits_axis_y(1);
+        scene.boat_space(fig, t, precision);
+        scene.draw_sensors(fig);
+        fig.draw_axis("x","y");
+        fig.save_ipe(filename + ".ipe");
+        fig.save_pdf(filename + ".pdf");
+    #endif
+}
+
 
 int main(int argc, char *argv[]) {
     // Parsing args
@@ -37,10 +60,6 @@ int main(int argc, char *argv[]) {
 
         std::exit(EXIT_FAILURE);
     }
-
-    // Number of threads
-    unsigned int n = std::thread::hardware_concurrency();
-    std::cout << n << " concurrent threads are supported.\n";
 
     // Frame of the problem
     codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
@@ -71,7 +90,13 @@ int main(int argc, char *argv[]) {
     std::vector<double> time(int(tf/h));
     std::generate(time.begin(), time.end(), [n = 0, h] () mutable { return (n++)*h; });
 
-    // Scene
+    // double precision = 1;
+    // Scene scene(X0, sensors, boats);
+    // for (const auto &t: time) {
+    //     step(scene, X0, t, tf, h, precision, p);
+    // }
+
+    Scene
     double precision = 0.1;
     Scene scene(X0, sensors, boats);
     for (const auto &t: time) {
