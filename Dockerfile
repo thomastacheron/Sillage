@@ -3,10 +3,10 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 
-RUN apt-get update && apt-get -y install python2.7 flex bison gcc g++ \
+RUN apt-get update && apt-get -y install git python2.7 flex bison gcc g++ \
     make pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
     libfmt-dev wget texlive-latex-base texlive-latex-extra tzdata ca-certificates \
-    texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/* && apt-get autoremove && apt-get clean
+    texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Installing Cmake
 ENV CMAKE_VERSION=3.22
