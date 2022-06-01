@@ -13,7 +13,7 @@ ENV CMAKE_VERSION=3.22
 ENV CMAKE_BUILD=4
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION.$CMAKE_BUILD/cmake-$CMAKE_VERSION.$CMAKE_BUILD-linux-x86_64.sh -O cmake.sh \
-    && /bin/sh cmake.sh --skip-license
+    && cmake.sh --skip-license
 
 # Installing IBEX
 RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git && cd ibex-lib \
