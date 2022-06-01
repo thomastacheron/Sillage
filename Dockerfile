@@ -9,11 +9,11 @@ RUN apt-get update && apt-get -y install git python2.7 flex bison gcc g++ \
     texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Installing Cmake
-ENV CMAKE_VERSION=3.22
-ENV CMAKE_BUILD=4
+ENV CMAKE_VERSION=3.23
+ENV CMAKE_BUILD=2
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION.$CMAKE_BUILD/cmake-$CMAKE_VERSION.$CMAKE_BUILD-linux-x86_64.sh -O cmake.sh \
-    && cmake.sh --skip-license
+    && /bin/sh cmake.sh --skip-license
 
 # Installing IBEX
 RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git && cd ibex-lib \
