@@ -31,7 +31,7 @@ void step(Scene scene, codac::IntervalVector X, double t, double tf, double h, d
         fig.set_number_digits_axis_x(1);
         fig.set_number_digits_axis_y(1);
         scene.boat_space(fig, t, precision);
-        scene.draw_sensors(fig);
+        scene.draw_sensors(fig, t);
         fig.draw_axis("x","y");
         fig.save_ipe(filename + ".ipe");
         fig.save_pdf(filename + ".pdf");
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
             fig.set_number_digits_axis_x(1);
             fig.set_number_digits_axis_y(1);
             scene.boat_space(fig, t, precision);
-            scene.draw_sensors(fig);
+            scene.draw_sensors(fig, t);
             fig.draw_axis("x","y");
             fig.save_ipe(filename + ".ipe");
             fig.save_pdf(filename + ".pdf");

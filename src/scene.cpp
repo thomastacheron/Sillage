@@ -79,13 +79,7 @@ void Scene::process() {
             codac::Interval I(t);
             I.inflate(0.5);
             s.t.push_back(I);
-
-            // SepBox
-            auto SepBoxI =  std::make_shared<codac::SepBox>(codac::IntervalVector(I));
-            s.SepBoxes.push_back(SepBoxI);
-            s.ArraySepBox->add(*SepBoxI);
         }
-        s.sep = make_shared<ibex::SepUnion>(*(s.ArraySepBox));
     }
     m_dirty = false;
 }
@@ -125,19 +119,92 @@ void Scene::detection_space(std::size_t i1, std::size_t i2, double precision, bo
     }
 }
 
-void Scene::draw_sensors(ipegenerator::Figure &fig, float size) {
+void Scene::draw_sensors(ipegenerator::Figure &fig, double t, double size) {
     fig.add_layer("sensors");
     fig.set_current_layer("sensors");
     fig.set_color_stroke("black");
-    fig.set_color_fill("red");
     for (const auto &s: m_sensors) {
+        if (s.is_awake(t)) {
+            fig.set_color_fill("green");
+        }
+        else {
+            fig.set_color_fill("red");
+        }
         fig.draw_circle(s.X(), s.Y(), size);
     }
 }
 
-void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision) {
+void Scene::draw_boat(ipegenerator::Figure &fig, const Boat &b, double t) {
+    // Wake
+    std::vector<double> x;
+    std::vector<double> y;
+    if (b.V() < 0) {
+        // Upper wake
+        double xu = (m_X[1].ub() - b.Y()) / std::tan(19.5*M_PI/180) + b.X();
+        if (m_X[0].contains(xu)) {
+            x.push_back(xu);
+            y.push_back(m_X[1].ub());
+        }
+        else {
+            x.push_back(m_X[0].ub());
+            y.push_back(b.Y() + std::tan(19.5*M_PI/180) * (m_X[0].ub() - b.X()));
+        }
+
+        // Boat
+        x.push_back(b.X());
+        y.push_back(b.Y());
+
+        // Lower wake
+        double xl = - (m_X[1].lb() - b.Y()) / std::tan(19.5*M_PI/180) + b.X();
+        if (m_X[0].contains(xl)) {
+            x.push_back(xl);
+            y.push_back(m_X[1].lb());
+        }
+        else {
+            x.push_back(m_X[0].ub());
+            y.push_back(b.Y() - std::tan(19.5*M_PI/180) * (m_X[0].ub() - b.X()));
+        }
+    }
+    else {
+        // Upper wake
+        double xu = -(m_X[1].ub() - b.Y()) / std::tan(19.5*M_PI/180) + b.X();
+        if (m_X[0].contains(xu)) {
+            x.push_back(xu);
+            y.push_back(m_X[1].ub());
+        }
+        else {
+            x.push_back(m_X[0].lb());
+            y.push_back(b.Y() - std::tan(19.5*M_PI/180) * (m_X[0].lb() - b.X()));
+        }
+
+        // Boat
+        x.push_back(b.X());
+        y.push_back(b.Y());
+
+        // Lower wake
+        double xl = (m_X[1].lb() - b.Y()) / std::tan(19.5*M_PI/180) + b.X();
+        if (m_X[0].contains(xl)) {
+            x.push_back(xl);
+            y.push_back(m_X[1].lb());
+        }
+        else {
+            x.push_back(m_X[0].lb());
+            y.push_back(b.Y() + std::tan(19.5*M_PI/180) * (m_X[0].lb() - b.X()));
+        }
+    }
+    fig.set_line_width(1);
+    fig.set_stroke_opacity(20);
+    fig.draw_polygon(x, y, "colorBlind1", "", ipegenerator::PATH_TYPE::STROKE_ONLY, false);
+
+    // Boat
+    double rot = (b.V() > 0) ? 0 : M_PI;
+    fig.reset_attribute();
+    fig.draw_auv(b.X()+b.V()*t, b.Y(), rot, 0.01);
+}
+
+void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision, bool causal) {
     // Solving the scene
-    solve(t, precision);
+    solve(t, precision, causal);
 
     // IN boxes
     fig.set_current_layer("inner");
@@ -157,19 +224,21 @@ void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision) {
         fig.draw_box(iv,"colorBlindMaybeStroke","colorBlindMaybeFill");
     }
 
+    // Sensors
+    draw_sensors(fig, t, 0.25);
+
     // Boats
     fig.add_layer("boats");
     fig.set_current_layer("boats");
     for (const auto &b: m_boats) {
         if (m_X[0].contains(b.X()+b.V()*t)) {
-            double rot = (b.V() > 0) ? 0 : M_PI;
-            fig.draw_auv(b.X()+b.V()*t, b.Y(), rot, 0.01);
+            draw_boat(fig, b, t);            
         }
     }
 }
 
-void Scene::boat_space(codac::VIBesFig &fig, double t, double precision) {
-    solve(t, precision);
+void Scene::boat_space(codac::VIBesFig &fig, double t, double precision, bool causal) {
+    solve(t, precision, causal);
 
     // IN boxes
     std::vector<codac::IntervalVector> v_in{ std::begin(m_M[codac::SetValue::IN]), std::end(m_M[codac::SetValue::IN]) };
@@ -196,15 +265,15 @@ void Scene::boat_space(codac::VIBesFig &fig, double t, double precision) {
     }
 }
 
-void Scene::solve(double t, double precision) {
+void Scene::solve(double t, double precision, bool causal) {
     if (m_dirty) {
         process();
     }
 
     // Cartesian product between detected times
     ibex::Array<ibex::Sep> cp(0);
-    for(const Sensor &s: m_sensors) {
-        cp.add(*(s.sep));
+    for(Sensor &s: m_sensors) {
+        cp.add(*(s.Sep()));
     }
     codac::SepCartProd Scp(cp);
 

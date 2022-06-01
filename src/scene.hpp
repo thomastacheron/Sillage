@@ -22,13 +22,16 @@ class Scene {
         void detection_space(std::size_t i1, std::size_t i2, double precision = 1, bool show_truth = false, bool use_ipe = false);
 
         // Boat space on vibes figure
-        void boat_space(codac::VIBesFig &fig, double t = 0, double precision = 0.1);
+        void boat_space(codac::VIBesFig &fig, double t = 0, double precision = 0.1, bool causal = false);
 
         // Boat space on ipe figure
-        void boat_space(ipegenerator::Figure &fig, double t = 0, double precision = 0.1);
+        void boat_space(ipegenerator::Figure &fig, double t = 0, double precision = 0.1, bool causal = false);
 
         // Show sensors on ipe figure
-        void draw_sensors(ipegenerator::Figure &fig, float size=0.25);
+        void draw_sensors(ipegenerator::Figure &fig, double t, double size=0.25);
+
+        // Show boats
+        void draw_boat(ipegenerator::Figure &fig, const Boat &b, double t);
 
         void set_sensors(const std::vector<Sensor> sensors);
         void set_boats(const std::vector<Boat> boats);
@@ -53,7 +56,7 @@ class Scene {
         void process();
 
         // Solving function
-        void solve(double t, double precision);
+        void solve(double t, double precision, bool causal);
 
         // Classified boxes holder
         std::map<codac::SetValue,std::list<codac::IntervalVector>> m_M;
