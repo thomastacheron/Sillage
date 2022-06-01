@@ -151,7 +151,7 @@ void Scene::draw_boat(ipegenerator::Figure &fig, const Boat &b, double t) {
         }
 
         // Boat
-        x.push_back(b.X());
+        x.push_back(b.X() + b.V() * t);
         y.push_back(b.Y());
 
         // Lower wake
@@ -178,7 +178,7 @@ void Scene::draw_boat(ipegenerator::Figure &fig, const Boat &b, double t) {
         }
 
         // Boat
-        x.push_back(b.X());
+        x.push_back(b.X() + b.V() * t);
         y.push_back(b.Y());
 
         // Lower wake
