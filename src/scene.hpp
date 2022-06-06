@@ -27,12 +27,6 @@ class Scene {
         // Boat space on ipe figure
         void boat_space(ipegenerator::Figure &fig, double t = 0, double precision = 0.1, bool causal = false);
 
-        // Show sensors on ipe figure
-        void draw_sensors(ipegenerator::Figure &fig, double t, double size=0.25);
-
-        // Show boats
-        void draw_boat(ipegenerator::Figure &fig, const Boat &b, double t);
-
         void set_sensors(const std::vector<Sensor> sensors);
         void set_boats(const std::vector<Boat> boats);
 

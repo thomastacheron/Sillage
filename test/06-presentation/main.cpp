@@ -41,7 +41,6 @@ int main(int argc, char *argv[]) {
     boat_space.set_number_digits_axis_x(1);
     boat_space.set_number_digits_axis_y(1);
     scene.boat_space(boat_space, 0, precision);
-    scene.draw_sensors(boat_space, 0.1);
     boat_space.draw_axis("x","y");
     boat_space.save_ipe(filename + "-boat.ipe");
     boat_space.save_pdf(filename + "-boat.pdf");

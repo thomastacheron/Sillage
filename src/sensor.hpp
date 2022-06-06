@@ -10,18 +10,28 @@
 
 #include <fmt/core.h>
 
+#include <ipegenerator/ipegenerator.h>
+
+struct SepSensor {
+    std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
+    std::shared_ptr<ibex::Array<ibex::Sep>> SepArray;
+    std::shared_ptr<ibex::SepUnion> Sep;
+};
+
 
 class Sensor {
     public:
         inline Sensor(float x, float y);
         std::vector<codac::Interval> t;
 
-        inline float X() const { return m_x; };
-        inline float Y() const { return m_y; };
+        float X() const { return m_x; };
+        float Y() const { return m_y; };
 
-        inline std::shared_ptr<ibex::Sep> Sep();
+        SepSensor Sep();
 
-        inline bool is_awake(double time) const;
+        bool is_awake(double time) const;
+
+        void draw(ipegenerator::Figure &fig, double t, double size) const;
 
         std::string function;
 
@@ -42,14 +52,18 @@ inline Sensor::Sensor(float x, float y) {
     ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>();
 }
 
-inline std::shared_ptr<ibex::Sep> Sensor::Sep() {
+inline SepSensor Sensor::Sep() {
+    std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
+    std::shared_ptr<ibex::Array<ibex::Sep>> SepArray = std::make_shared<ibex::Array<ibex::Sep>>(0);
     for (const auto & i: t) {
-        auto SepBoxI =  std::make_shared<codac::SepBox>(codac::IntervalVector(i));
-        SepBoxes.push_back(SepBoxI);
-        ArraySepBox->add(*SepBoxI);
+        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
+        SepBoxes.push_back(sb);
+        SepArray->add(*sb);
     }
-    sep = std::make_shared<ibex::SepUnion>(*ArraySepBox);
-    return sep;
+    auto Su = std::make_shared<ibex::SepUnion>(*SepArray);
+    SepSensor Ss{SepBoxes, SepArray, Su};
+
+    return Ss;
 }
 
 inline bool Sensor::is_awake(double time) const {
@@ -59,4 +73,16 @@ inline bool Sensor::is_awake(double time) const {
         }
     }
     return false;
+}
+
+inline void Sensor::draw(ipegenerator::Figure &fig, double t, double size) const {
+    fig.set_current_layer("sensors");
+    fig.set_color_stroke("black");
+    if (is_awake(t)) {
+        fig.set_color_fill("green");
+    }
+    else {
+        fig.set_color_fill("red");
+    }
+    fig.draw_circle(m_x, m_y, size);
 }
