@@ -15,7 +15,11 @@
 
 using namespace std;
 
-void step(Scene scene, codac::IntervalVector X, double t, double tf, double h, double precision, std::filesystem::path p){
+void step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Boat> boats, double t, double tf, double h, double precision, std::filesystem::path p, bool verbose){
+    if (verbose) {
+        std::cout << "Time " << t << std::endl;
+    }
+    Scene scene(X, sensors, boats);
     std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
     #ifdef WITH_VIBES
         vibes::beginDrawing();
@@ -54,9 +58,14 @@ int main(int argc, char *argv[]) {
         std::exit(EXIT_SUCCESS);
     }
 
+    bool verbose = result["verbose"].as<bool>();
+    if (verbose) {
+        unsigned int n = std::thread::hardware_concurrency();
+        std::cout << n << " concurrent threads are supported.\n";
+    }
+
     std::filesystem::path p(result["path"].as<std::string>());
     if (!std::filesystem::is_directory(p)) {
-
         std::exit(EXIT_FAILURE);
     }
 
@@ -84,21 +93,21 @@ int main(int argc, char *argv[]) {
     }
 
     // Time
-    double tf = 30;
-    double h = 0.01;
+    double tf = 1;
+    double h = 0.5;
     std::vector<double> time(int(tf/h));
     std::generate(time.begin(), time.end(), [n = 0, h] () mutable { return (n++)*h; });
 
     double precision = 1;
-    Scene scene(X0, sensors, boats);
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
-        std::thread t_solve(step, scene, X0, t, tf, h, precision, p);
-        v_threads.push_back(move(t_solve));
+        v_threads.emplace_back(step, X0, sensors, boats, t, tf, h, precision, p, verbose); 
     }
 
     for (auto &thread: v_threads) {
-        thread.join();
+        if (thread.joinable()) {
+            thread.join();
+        }
     }
 
     // double precision = 0.1;
