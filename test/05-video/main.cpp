@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     // Time
     double tf = 1;
     double h = 0.5;
-    std::vector<double> time(int(tf/h));
+    std::vector<double> time(int(tf/h)-1);
     std::generate(time.begin(), time.end(), [n = 0, h] () mutable { return (n++)*h; });
 
     double precision = 1;

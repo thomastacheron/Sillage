@@ -54,10 +54,11 @@ find_package (Threads)
 ################################################################################
 # Compile sources
 ################################################################################
-# add_executable(main src/main.cpp)
-# target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} fmt::fmt)
-
 add_library(wake_boat src/scene.cpp)
-target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${CODAC_LIBRARIES} ${IPEGENERATOR_LIBRARIES} fmt::fmt)
+target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt)
+
+add_executable(main src/main.cpp)
+target_include_directories(main PUBLIC cxxopts)
+target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt cxxopts ${CMAKE_THREAD_LIBS_INIT} wake_boat)
 
 add_subdirectory(test)
