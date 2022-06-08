@@ -41,6 +41,9 @@ int main(int argc, char *argv[]) {
 
     options.add_options()
         ("p,path", "Output path", cxxopts::value<std::string>())
+        ("d,duration", "Duration of the simulation", cxxopts::value<double>()->default_value("10"))
+        ("s,step", "Time step", cxxopts::value<double>()->default_value("0.1"))
+        ("precision", "Projection precision", cxxopts::value<double>()->default_value("1"))
         ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
         ("h,help", "Print usage")
     ;
@@ -59,6 +62,29 @@ int main(int argc, char *argv[]) {
 
     std::filesystem::path p(result["path"].as<std::string>());
     if (!std::filesystem::is_directory(p)) {
+        std::exit(EXIT_FAILURE);
+    }
+
+    double d = result["duration"].as<double>();
+    if (d < 0) {
+        std::cerr << "Simulation cannot have a negative duration !\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    double s = result["step"].as<double>();
+    if (s < 0) {
+        std::cerr << "Simulation cannot have a negative time-step !\n";
+        std::exit(EXIT_FAILURE);
+    }
+    
+    if (s > d) {
+        std::cerr << "Simulation cannot have a time-step greater than the time of the simulation !\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    double precision = result["precision"].as<double>();
+    if (precision < 0) {
+        std::cerr << "Projection precision cannot be negative !\n";
         std::exit(EXIT_FAILURE);
     }
 
@@ -92,16 +118,13 @@ int main(int argc, char *argv[]) {
     std::vector<std::future<double>> results;
 
     // Time
-    double tf = 10;
-    double h = 0.1;
-    std::vector<double> time(int(tf/h));
-    std::generate(time.begin(), time.end(), [n = 0, h] () mutable { return (n++)*h; });
+    std::vector<double> time(int(d/s));
+    std::generate(time.begin(), time.end(), [n = 0, s] () mutable { return (n++)*s; });
 
-    double precision = 1;
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
         results.emplace_back(
-            pool.enqueue(std::bind(step, X0, sensors, boats, t, tf, h, precision, p, verbose))
+            pool.enqueue(std::bind(step, X0, sensors, boats, t, d, s, precision, p, verbose))
         );
     }
 

@@ -30,6 +30,19 @@ include_directories(${IPEGENERATOR_INCLUDE_DIRS})
 set(LIBS ${IPEGENERATOR_LIBRARIES} ${LIBS})
 
 ################################################################################
+# Looking for IPE
+################################################################################
+include(FetchContent)
+FetchContent_Declare(libipe
+    URL https://github.com/otfried/ipe/releases/download/v7.2.24/ipe-7.2.24-src.tar.gz
+    URL_HASH SHA256=feb879f24d1dce25910790770446d50b03e46ee2ebd7d28157b1705971644f6f
+    DOWNLOAD_NO_EXTRACT true
+)
+FetchContent_MakeAvailable(libipe)
+
+file(ARCHIVE_EXTRACT INPUT ${libipe_SOURCE_DIR}/ipe-7.2.24-src.tar.gz DESTINATION ${CMAKE_SOURCE_DIR}/extern/ipe)
+
+################################################################################
 # Looking for Eigen
 ################################################################################
 find_package(Eigen3 REQUIRED NO_MODULE)
