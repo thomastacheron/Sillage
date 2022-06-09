@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "utils.hpp"
 
 #include <vector>
 #include <memory>
@@ -21,9 +22,7 @@
 
 #include <ipegenerator/ipegenerator.h>
 
-template <typename T> int sgn(T val) {
-    return (T(0) < val) - (val < T(0));
-}
+
 
 void drawBoat(codac::VIBesFig &fig, double cx, double cy, double theta, double scale, std::string params) {
     std::vector<double> x;

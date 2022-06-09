@@ -67,7 +67,7 @@ find_package (Threads)
 ################################################################################
 # Compile sources
 ################################################################################
-add_library(wake_boat src/scene.cpp)
+add_library(wake_boat src/scene.cpp src/utils.cpp)
 target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt)
 
 add_executable(main src/main.cpp)

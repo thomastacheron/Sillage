@@ -14,12 +14,16 @@
 #include <thread>
 #include "thread_pool.hpp"
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 using namespace std;
 
 double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Boat> boats, double t, double tf, double h, double precision, std::filesystem::path p, bool verbose){
     if (verbose) {
-        std::cout << "Time " << t << std::endl;
+        fmt::print(stdout, "Computing time : {0}\n", t);
     }
+
     Scene scene(X, sensors, boats);
     std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
     
@@ -29,6 +33,7 @@ double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Bo
     fig.set_number_digits_axis_y(1);
     scene.boat_space(fig, t, precision);
     fig.draw_axis("x","y");
+    fig.draw_text(fmt::format("{0} s", t), -1, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
     fig.save_ipe(filename + ".ipe");
 
     return t;
@@ -62,22 +67,27 @@ int main(int argc, char *argv[]) {
 
     std::filesystem::path p(result["path"].as<std::string>());
     if (!std::filesystem::is_directory(p)) {
+        fmt::print(stderr, "The provided path does not point to a directory !");
         std::exit(EXIT_FAILURE);
     }
 
-    double d = result["duration"].as<double>();
-    if (d < 0) {
+    if (verbose) {
+        fmt::print(stdout, "File path {0}\n", p.c_str());
+    }
+
+    double tmax = result["duration"].as<double>();
+    if (tmax < 0) {
         std::cerr << "Simulation cannot have a negative duration !\n";
         std::exit(EXIT_FAILURE);
     }
 
-    double s = result["step"].as<double>();
-    if (s < 0) {
+    double h = result["step"].as<double>();
+    if (h < 0) {
         std::cerr << "Simulation cannot have a negative time-step !\n";
         std::exit(EXIT_FAILURE);
     }
     
-    if (s > d) {
+    if (h > tmax) {
         std::cerr << "Simulation cannot have a time-step greater than the time of the simulation !\n";
         std::exit(EXIT_FAILURE);
     }
@@ -86,6 +96,10 @@ int main(int argc, char *argv[]) {
     if (precision < 0) {
         std::cerr << "Projection precision cannot be negative !\n";
         std::exit(EXIT_FAILURE);
+    }
+
+    if (verbose) {
+        fmt::print(stdout, "Duration : {0} s, Time-step {1} s\n", tmax, h);
     }
 
     // Frame of the problem
@@ -118,17 +132,13 @@ int main(int argc, char *argv[]) {
     std::vector<std::future<double>> results;
 
     // Time
-    std::vector<double> time(int(d/s));
-    std::generate(time.begin(), time.end(), [n = 0, s] () mutable { return (n++)*s; });
+    std::vector<double> time(int(tmax/h));
+    std::generate(time.begin(), time.end(), [counter = 0, h] () mutable { return (counter++)*h; });
 
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
         results.emplace_back(
-            pool.enqueue(std::bind(step, X0, sensors, boats, t, d, s, precision, p, verbose))
+            pool.enqueue(std::bind(step, X0, sensors, boats, t, tmax, h, precision, p, verbose))
         );
     }
-
-    for(auto && result: results)
-        std::cout << result.get() << ' ';
-    std::cout << std::endl;
 }
