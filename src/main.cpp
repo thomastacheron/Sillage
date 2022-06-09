@@ -112,17 +112,26 @@ int main(int argc, char *argv[]) {
     // Frame of the problem
     codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
 
+    // Random engine
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
     // Boats
     std::vector<Boat> boats;
-    std::vector<std::vector<double>> b_coords{{-22, 6, 5}, {-20, -3, 3}, {-16, -8, 2}, {-14, 3, 4}, {-12, -1, 2}, {8, -4, -3}, {14, 7, -4}, {20, -7, -2}, {23, 0, -5}};
-    for (const auto &c: b_coords) {
-        Boat b(c[0], c[1], c[2]);
-        boats.push_back(b);
+    unsigned int n_boats = 5;
+
+    std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
+    std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
+    std::uniform_real_distribution<double> distribution_by(X0[1].lb(), X0[1].ub());
+    std::uniform_real_distribution<double> distribution_bv(1, 5);
+    for (int i=0; i<n_boats; ++i) {
+        Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
+        Boat bp(distribution_bpx(generator), distribution_by(generator), -distribution_bv(generator));
+        boats.push_back(bn);
+        boats.push_back(bp);
     }
 
     // Sensors
-    std::random_device rd;
-    std::mt19937 generator(rd());
     std::uniform_real_distribution<double> distribution_x(X0[0].lb(), X0[0].ub());
     std::uniform_real_distribution<double> distribution_y(X0[1].lb(), X0[1].ub());
     int n_sensors = 50;
