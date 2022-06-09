@@ -27,7 +27,7 @@ class Sensor {
         float X() const { return m_x; };
         float Y() const { return m_y; };
 
-        SepSensor Sep();
+        SepSensor Sep(bool causal = false, double t_min = 0);
 
         bool is_awake(double time) const;
 
@@ -52,14 +52,22 @@ inline Sensor::Sensor(float x, float y) {
     ArraySepBox = std::make_shared<ibex::Array<ibex::Sep>>();
 }
 
-inline SepSensor Sensor::Sep() {
+inline SepSensor Sensor::Sep(bool causal, double t_min) {
     std::vector<std::shared_ptr<ibex::Sep>> SepBoxes;
     std::shared_ptr<ibex::Array<ibex::Sep>> SepArray = std::make_shared<ibex::Array<ibex::Sep>>(0);
+
+    if (causal) {
+        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(ibex::Interval(NEG_INFINITY, t_min)));
+        SepBoxes.push_back(sb);
+        SepArray->add(*sb);
+    }
+
     for (const auto & i: t) {
         auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
         SepBoxes.push_back(sb);
         SepArray->add(*sb);
     }
+    
     auto Su = std::make_shared<ibex::SepUnion>(*SepArray);
     SepSensor Ss{SepBoxes, SepArray, Su};
 

@@ -41,8 +41,8 @@ inline void Boat::draw(ipegenerator::Figure &fig, double t, codac::IntervalVecto
         x_l = X[0].ub();
     }
 
-    y_u = -sgn(m_v)*(x_u - m_x) * std::tan(19.5*M_PI/180) + m_y;
-    y_l = sgn(m_v)*(x_l - m_x) * std::tan(19.5*M_PI/180) + m_y;
+    y_u = -sgn(m_v)*(x_u - m_x - m_v * t) * std::tan(19.5*M_PI/180) + m_y;
+    y_l = sgn(m_v)*(x_l - m_x - m_v * t) * std::tan(19.5*M_PI/180) + m_y;
 
     result_u = cohenSutherlandClip(X, x_b_u, y_b_u, x_u, y_u);
     result_l = cohenSutherlandClip(X, x_b_l, y_b_l, x_l, y_l);

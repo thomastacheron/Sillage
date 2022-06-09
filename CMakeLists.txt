@@ -3,8 +3,8 @@ project(WakeBoat)
 
 # Settings
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -lpthread")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -lpthread")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3 -lpthread -std=c++17")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -lpthread -std=c++17")
 
 ################################################################################
 # Looking for IBEX
@@ -52,6 +52,7 @@ include_directories(${EIGEN3_INCLUDE_DIRS})
 # Looking for FMT
 ################################################################################
 find_package(fmt REQUIRED)
+message(STATUS "Found FMT version ${FMT_VERSION}")
 include_directories(${fmt_INCLUDE_DIRS})
 
 ################################################################################
@@ -68,6 +69,7 @@ find_package (Threads)
 # Compile sources
 ################################################################################
 add_library(wake_boat src/scene.cpp src/utils.cpp)
+target_include_directories(wake_boat PUBLIC ${fmt_INCLUDE_DIRS})
 target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt)
 
 add_executable(main src/main.cpp)

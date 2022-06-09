@@ -19,7 +19,7 @@
 
 using namespace std;
 
-double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Boat> boats, double t, double tf, double h, double precision, std::filesystem::path p, bool verbose){
+double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Boat> boats, double t, double tf, double h, double precision, std::filesystem::path p, bool verbose, bool causal){
     if (verbose) {
         fmt::print(stdout, "Computing time : {0}\n", t);
     }
@@ -31,9 +31,10 @@ double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Bo
     fig.set_graduation_parameters(X[0].lb(),5,X[1].lb(),5);
     fig.set_number_digits_axis_x(1);
     fig.set_number_digits_axis_y(1);
-    scene.boat_space(fig, t, precision);
+    scene.boat_space(fig, t, precision, causal);
     fig.draw_axis("x","y");
-    fig.draw_text(fmt::format("{0} s", t), -1, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
+    fig.reset_attribute();
+    fig.draw_text(fmt::format("{0:.1f} s", t), -1, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
     fig.save_ipe(filename + ".ipe");
 
     return t;
@@ -50,6 +51,7 @@ int main(int argc, char *argv[]) {
         ("s,step", "Time step", cxxopts::value<double>()->default_value("0.1"))
         ("precision", "Projection precision", cxxopts::value<double>()->default_value("1"))
         ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+        ("c,causal", "Causal simulation", cxxopts::value<bool>()->default_value("false"))
         ("h,help", "Print usage")
     ;
     auto result = options.parse(argc, argv);
@@ -102,6 +104,11 @@ int main(int argc, char *argv[]) {
         fmt::print(stdout, "Duration : {0} s, Time-step {1} s\n", tmax, h);
     }
 
+    bool causal = result["causal"].as<bool>();
+    if (causal) {
+        fmt::print("Causal simulation\n");
+    }
+
     // Frame of the problem
     codac::IntervalVector X0({{-25, 25}, {-10, 10}, {-6, 6}});
 
@@ -138,7 +145,7 @@ int main(int argc, char *argv[]) {
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
         results.emplace_back(
-            pool.enqueue(std::bind(step, X0, sensors, boats, t, tmax, h, precision, p, verbose))
+            pool.enqueue(std::bind(step, X0, sensors, boats, t, tmax, h, precision, p, verbose, causal))
         );
     }
 }

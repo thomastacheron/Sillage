@@ -33,6 +33,8 @@ class Scene {
         std::vector<Sensor> get_sensors();
         std::vector<Boat> get_boats();
 
+        double t_min() const;
+
     private:
         // State space
         codac::IntervalVector m_X;

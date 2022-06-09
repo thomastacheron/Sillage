@@ -1,12 +1,12 @@
-FROM ubuntu:20.04
+FROM gcc:12
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Paris
 
-RUN apt-get update && apt-get -y install git python2.7 flex bison gcc g++ \
-    make pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
+RUN apt-get update && apt-get -y install git python2.7 flex bison \
+    make cmake pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
     libfmt-dev wget texlive-latex-base texlive-latex-extra tzdata ca-certificates \
-    texlive-fonts-recommended bash --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    texlive-fonts-recommended libfmt-dev --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Installing Cmake
 ENV CMAKE_VERSION=3.23
@@ -18,16 +18,20 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION.$CMA
 ENV PATH="/opt/cmake/bin:${PATH}"
 
 # Installing IBEX
-RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git && cd ibex-lib \
-    && mkdir build && cd build && cmake .. && make -j8 && make install
+RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git --single-branch && cd ibex-lib \
+    && mkdir build && cd build && cmake .. && make && make install
 
 # Installing CODAC
 RUN git clone https://github.com/Teusner/codac -b dev --single-branch && cd codac \
-    && mkdir build && cd build && cmake .. && make -j8 && make install
+    && mkdir build && cd build && cmake .. && make && make install
 
 # Installing IPE-GENERATOR
 RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch && cd ipe_generator \
-    && mkdir build && cd build && cmake .. && make -j8 && make install
+    && mkdir build && cd build && cmake .. && make && make install
+
+# Installing FMT
+RUN git clone https://github.com/fmtlib/fmt -b master --single-branch && cd fmt \
+    && mkdir build && cd build && cmake .. && make && make install
 
 # WakeBoat
 RUN mkdir -p /WakeBoat/build && mkdir /output

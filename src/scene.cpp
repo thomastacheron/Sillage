@@ -73,6 +73,18 @@ std::vector<Boat> Scene::get_boats() {
     return m_boats;
 }
 
+double Scene::t_min() const {
+    double t_min = 0;
+    for (const Sensor &s : m_sensors) {
+        for (const codac::Interval i: s.t) {
+            if (i.lb() < t_min) {
+                t_min = i.lb();
+            }
+        }
+    }
+    return t_min;
+}
+
 void Scene::process() {
     for (auto &s : m_sensors) {
         s.t.clear();
@@ -195,7 +207,7 @@ void Scene::solve(double t, double precision, bool causal) {
     ibex::Array<ibex::Sep> cp(0);
     std::vector<SepSensor> vec;
     for(Sensor &s: m_sensors) {
-        SepSensor Ss = s.Sep();
+        SepSensor Ss = s.Sep(causal, t_min());
         vec.push_back(Ss);
         cp.add(*(Ss.Sep));
     }
