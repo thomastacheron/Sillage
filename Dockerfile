@@ -6,14 +6,16 @@ ENV TZ=Europe/Paris
 RUN apt-get update && apt-get -y install git python2.7 flex bison gcc g++ \
     make pkg-config libeigen3-dev libpng-dev libjpeg-dev libspiro-dev \
     libfmt-dev wget texlive-latex-base texlive-latex-extra tzdata ca-certificates \
-    texlive-fonts-recommended --no-install-recommends && rm -rf /var/lib/apt/lists/*
+    texlive-fonts-recommended bash --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Installing Cmake
 ENV CMAKE_VERSION=3.23
 ENV CMAKE_BUILD=2
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION.$CMAKE_BUILD/cmake-$CMAKE_VERSION.$CMAKE_BUILD-linux-x86_64.sh -O cmake.sh \
-    && /bin/sh cmake.sh --skip-license
+    && chmod +x cmake.sh && mkdir -p /opt/cmake && ./cmake.sh --skip-license --prefix=/opt/cmake
+
+ENV PATH="/opt/cmake/bin:${PATH}"
 
 # Installing IBEX
 RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git && cd ibex-lib \
@@ -34,6 +36,6 @@ COPY test /WakeBoat/test
 COPY extern /WakeBoat/extern
 COPY CMakeLists.txt /WakeBoat
 
-RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON && make -j8
+RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON -DCMAKE_BUILD_TYPE=Release && make -j8
 
-ENTRYPOINT ["/WakeBoat/build/test/05-video", "-p", "/output"]
+ENTRYPOINT ["/WakeBoat/build/main", "-p", "/output", "-d", "30", "-s", "0.1", "--precision", "0.1", "-v"]
