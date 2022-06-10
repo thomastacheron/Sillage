@@ -207,7 +207,7 @@ void Scene::solve(double t, double precision, bool causal) {
     ibex::Array<ibex::Sep> cp(0);
     std::vector<SepSensor> vec;
     for(Sensor &s: m_sensors) {
-        SepSensor Ss = s.Sep(causal, t_min());
+        SepSensor Ss = s.Sep(t, causal, t_min());
         vec.push_back(Ss);
         cp.add(*(Ss.Sep));
     }
