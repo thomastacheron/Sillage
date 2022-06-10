@@ -148,9 +148,9 @@ int main(int argc, char *argv[]) {
     std::vector<std::future<double>> results;
 
     // Time
-    int counter = (causal) ? -int(5/h) : 0;
+    int counter = (causal) ? -int(5.0 / h) : 0;
     std::vector<double> time(int(tmax/h));
-    std::generate(time.begin(), time.end(), [counter, h] () mutable { return (counter++)*h; });
+    std::generate(time.begin(), time.end(), [counter, h] () mutable { return (counter++) * h; });
 
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
