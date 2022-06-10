@@ -25,7 +25,7 @@ double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Bo
     }
 
     Scene scene(X, sensors, boats);
-    std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", int(t/h), std::to_string(int(tf/h)).size());
+    std::string filename = std::filesystem::absolute(p) / fmt::format("Wake_{0:0>{1}d}", (causal) ? int(t/h+5): int(t/h), std::to_string(int(tf/h)).size());
     
     ipegenerator::Figure fig(X.subvector(0, 1), 100, 100*X[1].diam()/X[0].diam());
     fig.set_graduation_parameters(X[0].lb(),5,X[1].lb(),5);
@@ -149,9 +149,8 @@ int main(int argc, char *argv[]) {
 
     // Time
     Scene scene(X0, sensors, boats);
-    int counter = (causal) ? scene.t_min() : 0;
     std::vector<double> time(int(tmax/h));
-    std::generate(time.begin(), time.end(), [counter, h] () mutable { return (counter++) * h; });
+    std::generate(time.begin(), time.end(), [counter = (causal) ? int(scene.t_min()/h-5) : 0, h] () mutable { return (counter++) * h; });
 
     std::vector<std::thread> v_threads;
     for (const auto &t: time) {
