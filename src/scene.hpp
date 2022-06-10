@@ -33,7 +33,7 @@ class Scene {
         std::vector<Sensor> get_sensors();
         std::vector<Boat> get_boats();
 
-        double t_min() const;
+        double t_min();
 
     private:
         // State space
