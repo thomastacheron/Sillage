@@ -57,15 +57,25 @@ inline SepSensor Sensor::Sep(bool causal, double t_min) {
     std::shared_ptr<ibex::Array<ibex::Sep>> SepArray = std::make_shared<ibex::Array<ibex::Sep>>(0);
 
     if (causal) {
-        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(ibex::Interval(NEG_INFINITY, t_min)));
+        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(codac::Interval(NEG_INFINITY, t_min)));
         SepBoxes.push_back(sb);
         SepArray->add(*sb);
-    }
 
-    for (const auto & i: t) {
-        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
-        SepBoxes.push_back(sb);
-        SepArray->add(*sb);
+        for (const auto & i: t) {
+            codac::Interval i_trunc = i &codac::Interval(NEG_INFINITY, t_min);
+            if (!i_trunc.is_empty()) {
+                auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(i_trunc));
+                SepBoxes.push_back(sb);
+                SepArray->add(*sb);
+            }
+        }
+    }
+    else {
+        for (const auto & i: t) {
+            auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector(i));
+            SepBoxes.push_back(sb);
+            SepArray->add(*sb);
+        }
     }
     
     auto Su = std::make_shared<ibex::SepUnion>(*SepArray);
