@@ -61,7 +61,7 @@ inline SepSensor Sensor::Sep(double time, bool causal, double t_min) {
         SepBoxes.push_back(sb_min);
         SepArray->add(*sb_min);
 
-        auto sb_max = std::make_shared<codac::SepBox>(codac::IntervalVector(codac::Interval(t, POS_INFINITY)));
+        auto sb_max = std::make_shared<codac::SepBox>(codac::IntervalVector(codac::Interval(time, POS_INFINITY)));
         SepBoxes.push_back(sb_max);
         SepArray->add(*sb_max);
 
