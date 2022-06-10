@@ -23,15 +23,15 @@ RUN git clone -b actions https://github.com/lebarsfa/ibex-lib.git --single-branc
 
 # Installing CODAC
 RUN git clone https://github.com/Teusner/codac -b dev --single-branch && cd codac \
-    && mkdir build && cd build && cmake .. && make && make install
+    && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # Installing IPE-GENERATOR
 RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch && cd ipe_generator \
-    && mkdir build && cd build && cmake .. && make && make install
+    && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # Installing FMT
 RUN git clone https://github.com/fmtlib/fmt -b master --single-branch && cd fmt \
-    && mkdir build && cd build && cmake .. && make && make install
+    && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # WakeBoat
 RUN mkdir -p /WakeBoat/build && mkdir /output
