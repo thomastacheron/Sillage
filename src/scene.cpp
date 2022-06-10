@@ -74,6 +74,10 @@ std::vector<Boat> Scene::get_boats() {
 }
 
 double Scene::t_min() const {
+    if (m_dirty) {
+        process();
+    }
+    
     double t_min = 0;
     for (const Sensor &s : m_sensors) {
         for (const codac::Interval i: s.t) {

@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
     std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
     std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
-    std::uniform_real_distribution<double> distribution_by(X0[1].lb(), X0[1].ub());
+    std::uniform_real_distribution<double> distribution_by(0.8*X0[1].lb(), 0.8*X0[1].ub());
     std::uniform_real_distribution<double> distribution_bv(1, 5);
     for (int i=0; i<n_boats; ++i) {
         Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
@@ -148,7 +148,8 @@ int main(int argc, char *argv[]) {
     std::vector<std::future<double>> results;
 
     // Time
-    int counter = (causal) ? -int(5.0 / h) : 0;
+    Scene scene(X0, sensors, boats);
+    int counter = (causal) ? scene.t_min() : 0;
     std::vector<double> time(int(tmax/h));
     std::generate(time.begin(), time.end(), [counter, h] () mutable { return (counter++) * h; });
 
