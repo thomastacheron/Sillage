@@ -232,13 +232,13 @@ void Scene::solve(double t, double precision, bool causal) {
     // Projection of the separator along x and y given a v
     std::vector<std::shared_ptr<ibex::Sep>> refs;
     ibex::Array<ibex::Sep> a(0);
-    codac::Interval v_p = m_X[2] & codac::Interval(precision, POS_INFINITY);
+    codac::Interval v_p = m_X[2] & codac::Interval((causal) ? 1 : precision, POS_INFINITY);
     if (!v_p.is_empty()) {
         auto Sp = std::make_shared<codac::SepProj>(Si, v_p, precision);
         refs.push_back(Sp);
         a.add(*Sp);
     }
-    codac::Interval v_m = m_X[2] & codac::Interval(NEG_INFINITY, -precision);
+    codac::Interval v_m = m_X[2] & codac::Interval(NEG_INFINITY, (causal) ? -1 : -precision);
     if (!v_m.is_empty()) {
         auto Sp = std::make_shared<codac::SepProj>(Si, v_m, precision);
         refs.push_back(Sp);

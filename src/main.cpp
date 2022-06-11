@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
     std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
     std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
     std::uniform_real_distribution<double> distribution_by(0.8*X0[1].lb(), 0.8*X0[1].ub());
-    std::uniform_real_distribution<double> distribution_bv(1, 5);
+    std::uniform_real_distribution<double> distribution_bv(1.5, 4.5);
     for (int i=0; i<n_boats; ++i) {
         Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
         Boat bp(distribution_bpx(generator), distribution_by(generator), -distribution_bv(generator));
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     // Sensors
     std::uniform_real_distribution<double> distribution_x(X0[0].lb(), X0[0].ub());
     std::uniform_real_distribution<double> distribution_y(X0[1].lb(), X0[1].ub());
-    int n_sensors = 50;
+    int n_sensors = 30;
     std::vector<Sensor> sensors;
     for (int i=0; i<n_sensors; ++i) {
         Sensor s(distribution_x(generator), distribution_y(generator));
