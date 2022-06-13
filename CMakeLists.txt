@@ -61,6 +61,11 @@ include_directories(${fmt_INCLUDE_DIRS})
 add_subdirectory(extern/cxxopts)
 
 ################################################################################
+# Looking for Poisson-Disk-Generator
+################################################################################
+include_directories(extern/poisson-disk-generator)
+
+################################################################################
 # Looking for THREADS
 ################################################################################
 find_package (Threads)
