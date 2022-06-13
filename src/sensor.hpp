@@ -61,9 +61,9 @@ inline SepSensor Sensor::Sep(double time, bool causal, double t_min) {
         // SepBoxes.push_back(sb_min);
         // SepArray->add(*sb_min);
 
-        // auto sb_max = std::make_shared<codac::SepBox>(codac::IntervalVector(codac::Interval(time, POS_INFINITY)));
-        // SepBoxes.push_back(sb_max);
-        // SepArray->add(*sb_max);
+        auto sb_max = std::make_shared<codac::SepBox>(codac::IntervalVector(codac::Interval(time, POS_INFINITY)));
+        SepBoxes.push_back(sb_max);
+        SepArray->add(*sb_max);
 
         for (const auto & i: t) {
             codac::Interval i_trunc = i & codac::Interval(NEG_INFINITY, time);
@@ -81,12 +81,7 @@ inline SepSensor Sensor::Sep(double time, bool causal, double t_min) {
             SepArray->add(*sb);
         }
     }
-    if (SepArray->size() == 0) {
-        auto sb = std::make_shared<codac::SepBox>(codac::IntervalVector::empty(1));
-        SepBoxes.push_back(sb);
-        SepArray->add(*sb);
-    }
-    
+
     auto Su = std::make_shared<ibex::SepUnion>(*SepArray);
     SepSensor Ss{SepBoxes, SepArray, Su};
 
