@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     // Sensors
     std::uniform_real_distribution<double> distribution_x(X0[0].lb(), X0[0].ub());
     std::uniform_real_distribution<double> distribution_y(X0[1].lb(), X0[1].ub());
-    int n_sensors = 30;
+    int n_sensors = 50;
     std::vector<Sensor> sensors;
     for (int i=0; i<n_sensors; ++i) {
         Sensor s(distribution_x(generator), distribution_y(generator));
