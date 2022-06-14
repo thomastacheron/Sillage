@@ -17,6 +17,8 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include "PoissonGenerator.h"
+
 using namespace std;
 
 double step(codac::IntervalVector X, std::vector<Sensor> sensors, std::vector<Boat> boats, double t, double tf, double h, double precision, std::filesystem::path p, bool verbose, bool causal){
@@ -132,23 +134,16 @@ int main(int argc, char *argv[]) {
     }
 
     // Sensors
-    std::uniform_real_distribution<double> distribution_x(0.8*X0[0].lb(), 0.8*X0[0].ub());
-    std::uniform_real_distribution<double> distribution_y(X0[1].lb(), X0[1].ub());
-    int n_sensors = 20;
-    std::vector<Sensor> sensors;
-    for (int i=0; i<n_sensors; ++i) {
-        Sensor s(distribution_x(generator), distribution_y(generator));
-        sensors.push_back(s);
-    }
+    int n_sensors = 50;
+    PoissonGenerator::DefaultPRNG PRNG;
+    const auto Points = PoissonGenerator::generatePoissonPoints(n_sensors, PRNG, false);
 
-    // Extremities sensors
-    std::uniform_real_distribution<double> distribution_ex(0.8*X0[0].ub(), 0.95*X0[0].ub());
-    int n_extremity_sensors = 10;
-    for (int i=0; i<n_extremity_sensors; ++i) {
-        Sensor sp(distribution_ex(generator), distribution_y(generator));
-        Sensor sm(-distribution_ex(generator), distribution_y(generator));
-        sensors.push_back(sp);
-        sensors.push_back(sm);
+    std::vector<Sensor> sensors;
+    for (auto i = Points.begin(); i != Points.end(); i++) {
+        double x = i->x * X0[0].diam() + X0[0].lb();
+        double y = i->y * X0[1].diam() + X0[1].lb();
+        Sensor s(x, y);
+        sensors.push_back(s);
     }
 
     // Tread Pool
