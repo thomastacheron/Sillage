@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <mutex>
 
 #include "sensor.hpp"
 #include "boat.hpp"
@@ -21,11 +22,8 @@ class Scene {
         
         void detection_space(std::size_t i1, std::size_t i2, double precision = 1, bool show_truth = false, bool use_ipe = false);
 
-        // Boat space on vibes figure
-        void boat_space(codac::VIBesFig &fig, double t = 0, double precision = 0.1, bool causal = false);
-
         // Boat space on ipe figure
-        void boat_space(ipegenerator::Figure &fig, double t = 0, double precision = 0.1, bool causal = false);
+        void boat_space(std::map<codac::SetValue,std::list<codac::IntervalVector>> &M, ipegenerator::Figure &fig, double t=0);
 
         void set_sensors(const std::vector<Sensor> sensors);
         void set_boats(const std::vector<Boat> boats);
@@ -34,6 +32,9 @@ class Scene {
         std::vector<Boat> get_boats();
 
         double t_min();
+
+        // Solving function
+        std::pair<double,std::map<codac::SetValue,std::list<codac::IntervalVector>>> solve(double t, double precision, bool causal = false);
 
     private:
         // State space
@@ -51,9 +52,5 @@ class Scene {
         // Process function to recompute detection time when the dirty flag is up
         void process();
 
-        // Solving function
-        void solve(double t, double precision, bool causal);
-
-        // Classified boxes holder
-        std::map<codac::SetValue,std::list<codac::IntervalVector>> m_M;
+        std::mutex m_mutex;
 };

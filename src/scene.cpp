@@ -5,6 +5,7 @@
 #include <memory>
 #include <cmath>
 #include <string>
+#include <mutex>
 #include <fmt/core.h>
 
 #include "boat.hpp"
@@ -54,11 +55,13 @@ void drawBoat(codac::VIBesFig &fig, double cx, double cy, double theta, double s
 
 
 void Scene::set_sensors(const std::vector<Sensor> sensors) {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_dirty = true;
     m_sensors = sensors;
 }
 
 void Scene::set_boats(const std::vector<Boat> boats) {
+    std::lock_guard<std::mutex> guard(m_mutex);
     m_dirty = true;
     m_boats = boats;
 }
@@ -90,13 +93,14 @@ double Scene::t_min() {
 }
 
 void Scene::process() {
+    std::lock_guard<std::mutex> guard(m_mutex);
     for (auto &s : m_sensors) {
         s.t.clear();
         for (const auto &b: m_boats) {
             // Detection Interval
             double t = 1 / b.V() * (sgn(b.V()) * std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
-            I.inflate(0.5);
+            I.inflate(0.3);
             s.t.push_back(I);
         }
     }
@@ -138,25 +142,22 @@ void Scene::detection_space(std::size_t i1, std::size_t i2, double precision, bo
     }
 }
 
-void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision, bool causal) {
-    // Solving the scene
-    solve(t, precision, causal);
-
+void Scene::boat_space(std::map<codac::SetValue,std::list<codac::IntervalVector>> &M, ipegenerator::Figure &fig, double t) {
     // IN boxes
     fig.set_current_layer("inner");
-    for (const auto &iv : m_M[codac::SetValue::IN]) {
+    for (const auto &iv : M[codac::SetValue::IN]) {
         fig.draw_box(iv,"colorBlindInStroke","colorBlindInFill");
     }
 
     // OUT boxes
     fig.set_current_layer("outer");
-    for (const auto &iv : m_M[codac::SetValue::OUT]) {
+    for (const auto &iv : M[codac::SetValue::OUT]) {
         fig.draw_box(iv,"colorBlindOutStroke","colorBlindOutFill");
     }
 
     // UNKNOWN boxes
     fig.set_current_layer("uncertain");
-    for (const auto &iv : m_M[codac::SetValue::UNKNOWN]) {
+    for (const auto &iv : M[codac::SetValue::UNKNOWN]) {
         fig.draw_box(iv,"colorBlindMaybeStroke","colorBlindMaybeFill");
     }
 
@@ -174,35 +175,7 @@ void Scene::boat_space(ipegenerator::Figure &fig, double t, double precision, bo
     }
 }
 
-void Scene::boat_space(codac::VIBesFig &fig, double t, double precision, bool causal) {
-    solve(t, precision, causal);
-
-    // IN boxes
-    std::vector<codac::IntervalVector> v_in{ std::begin(m_M[codac::SetValue::IN]), std::end(m_M[codac::SetValue::IN]) };
-    fig.draw_boxes(v_in, "black[red]");
-
-    // OUT boxes
-    std::vector<codac::IntervalVector> v_out{ std::begin(m_M[codac::SetValue::OUT]), std::end(m_M[codac::SetValue::OUT]) };
-    fig.draw_boxes(v_out, "black[blue]");
-
-    // UNKNOWN boxes
-    std::vector<codac::IntervalVector> v_unk{ std::begin(m_M[codac::SetValue::UNKNOWN]), std::end(m_M[codac::SetValue::UNKNOWN]) };
-    fig.draw_boxes(v_unk, "black[yellow]");
-
-    // Showing sensors
-    for (auto const &s : m_sensors) {
-        fig.draw_circle(s.X(), s.Y(), 0.2, "black[red]");
-    }
-
-    // Showing boats
-    for (auto const &b : m_boats) {
-        double rot = (b.V() > 0) ? 0 : M_PI;
-        drawBoat(fig, b.X(), b.Y(), rot, 1, "black[#34495e]");
-        drawBoat(fig, b.X()+b.V()*t, b.Y(), rot, 1, "black[yellow]");
-    }
-}
-
-void Scene::solve(double t, double precision, bool causal) {
+std::pair<double,std::map<codac::SetValue,std::list<codac::IntervalVector>>> Scene::solve(double t, double precision, bool causal) {
     if (m_dirty) {
         process();
     }
@@ -247,5 +220,5 @@ void Scene::solve(double t, double precision, bool causal) {
     ibex::SepUnion Su(a);
 
     // Sivia
-    m_M = codac::SIVIA(m_X.subvector(0, 1), Su, precision, false, "", true);
+    return std::make_pair(t, codac::SIVIA(m_X.subvector(0, 1), Su, precision, false, "", true));
 }
