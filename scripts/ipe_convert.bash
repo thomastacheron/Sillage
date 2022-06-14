@@ -5,11 +5,14 @@ for f in ${1}/*; do
     # echo -e ${f%.*} ${f##*.} ${f##*/}
     filename=${f##*/}
     fileradical=${filename%.*}
-    echo ${filename} ${fileradical}
     if [ ${fileradical} != "png" ]
     then
-        iperender -png -resolution 1000 ${1}/${filename} ${1}/png/${fileradical}.png
+        if [ ! -f ${1}/png/${fileradical}.png ]
+        then
+            echo ${fileradical}
+            iperender -png -resolution 1300 ${1}/${filename} ${1}/png/${fileradical}.png
+        fi
     fi
 done
 
-ffmpeg -framerate 10 -pattern_type glob -i "${1}/png/*.png" ${2}.mp4
+ffmpeg -framerate 20 -pattern_type glob -i "${1}/png/*.png" ${2}.mp4
