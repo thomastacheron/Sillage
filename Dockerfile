@@ -47,4 +47,4 @@ COPY CMakeLists.txt /WakeBoat
 
 RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON -DCMAKE_BUILD_TYPE=Release && make -j8
 
-ENTRYPOINT ["/WakeBoat/build/main", "-p", "/output", "-d", "30", "-s", "0.1", "--precision", "0.1", "-v"]
+ENTRYPOINT ["/WakeBoat/build/main", "--config", "/WakeBoat/config/tests/acausal.yaml", "-v"]
