@@ -38,13 +38,12 @@ RUN git clone --recursive https://github.com/biojppm/rapidyaml -b master --singl
     && mkdir build && cd build && cmake .. && make -j8 && make install
 
 # WakeBoat
-RUN mkdir -p /WakeBoat/build && mkdir /output
+RUN mkdir -p /WakeBoat/build && mkdir /output && mkdir /config
 COPY src /WakeBoat/src
 COPY test /WakeBoat/test
 COPY extern /WakeBoat/extern
-COPY extern /WakeBoat/config
 COPY CMakeLists.txt /WakeBoat
 
 RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON -DCMAKE_BUILD_TYPE=Release && make -j8
 
-ENTRYPOINT ["/WakeBoat/build/main", "--config", "/WakeBoat/config/tests/acausal.yaml", "-v"]
+ENTRYPOINT ["/WakeBoat/build/main", "--config", "/config/tests/acausal.yaml", "-v"]
