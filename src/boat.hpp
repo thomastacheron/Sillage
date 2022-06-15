@@ -65,6 +65,6 @@ inline void Boat::draw(ipegenerator::Figure &fig, double t, codac::IntervalVecto
         double rot = (m_v > 0) ? 0 : M_PI;
         fig.reset_attribute();
         fig.set_current_layer("boats");
-        fig.draw_auv(m_x+m_v*t, m_y, rot, 0.01);
+        fig.draw_boat(m_x+m_v*t, m_y, rot, 0.01);
     }
 }

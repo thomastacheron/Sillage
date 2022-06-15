@@ -38,6 +38,7 @@ RUN mkdir -p /WakeBoat/build && mkdir /output
 COPY src /WakeBoat/src
 COPY test /WakeBoat/test
 COPY extern /WakeBoat/extern
+COPY extern /WakeBoat/config
 COPY CMakeLists.txt /WakeBoat
 
 RUN cd /WakeBoat/build && cmake .. -DWITH_IPE=ON -DCMAKE_BUILD_TYPE=Release && make -j8
