@@ -33,6 +33,10 @@ RUN git clone https://github.com/Teusner/ipe_generator -b dev --single-branch &&
 RUN git clone https://github.com/fmtlib/fmt -b master --single-branch && cd fmt \
     && mkdir build && cd build && cmake .. && make -j8 && make install
 
+# Installing FMT
+RUN git clone --recursive https://github.com/biojppm/rapidyaml -b master --single-branch && cd rapidyaml \
+    && mkdir build && cd build && cmake .. && make -j8 && make install
+
 # WakeBoat
 RUN mkdir -p /WakeBoat/build && mkdir /output
 COPY src /WakeBoat/src
