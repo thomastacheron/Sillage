@@ -106,6 +106,11 @@ int main(int argc, char *argv[]) {
             ++i;
         });
 
+    if (X0[2].lb() <= 0) {
+        fmt::print(stderr, "The minimal velocity should be strictly positive !");
+        std::exit(EXIT_FAILURE);
+    }
+
     // Time
     double tmin;
     double tmax;
@@ -187,7 +192,7 @@ int main(int argc, char *argv[]) {
     std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
     std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
     std::uniform_real_distribution<double> distribution_by(0.8*X0[1].lb(), 0.8*X0[1].ub());
-    std::uniform_real_distribution<double> distribution_bv(1.5, 5.5);
+    std::uniform_real_distribution<double> distribution_bv(X0[2].lb(), X0[2].ub());
     for (int i=0; i<n_boats; ++i) {
         Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
         Boat bp(distribution_bpx(generator), distribution_by(generator), -distribution_bv(generator));
