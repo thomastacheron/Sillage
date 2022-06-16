@@ -100,7 +100,7 @@ void Scene::process() {
             // Detection Interval
             double t = 1 / b.V() * (sgn(b.V()) * std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
             codac::Interval I(t);
-            I.inflate(0.3);
+            I.inflate(0.5);
             s.t.push_back(I);
         }
     }
@@ -213,9 +213,9 @@ std::pair<double,std::map<codac::SetValue,std::list<codac::IntervalVector>>> Sce
     }
     codac::Interval v_m = -m_X[2];
     if (!v_m.is_empty()) {
-        auto Sp = std::make_shared<codac::SepProj>(Si, v_m, precision);
-        refs.push_back(Sp);
-        a.add(*Sp);
+        auto Sm = std::make_shared<codac::SepProj>(Si, v_m, precision);
+        refs.push_back(Sm);
+        a.add(*Sm);
     }
     ibex::SepUnion Su(a);
 

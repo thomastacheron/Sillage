@@ -41,7 +41,7 @@ void draw_ipe(double t, double tmin, double tmax, double h, Scene &scene, std::m
     scene.boat_space(M, fig, t);
     fig.draw_axis("x","y");
     fig.reset_attribute();
-    fig.draw_text(fmt::format("{0:.1f} s", t), -1, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
+    fig.draw_text(fmt::format("{0:.2f} s", t), -2, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
     fig.save_ipe(filename + ".ipe");
 }
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
     std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
     std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
     std::uniform_real_distribution<double> distribution_by(0.8*X0[1].lb(), 0.8*X0[1].ub());
-    std::uniform_real_distribution<double> distribution_bv(X0[2].lb(), X0[2].ub());
+    std::uniform_real_distribution<double> distribution_bv(X0[2].lb()+0.1*X0[2].diam(), X0[2].ub()-0.1*X0[2].diam());
     for (int i=0; i<n_boats; ++i) {
         Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
         Boat bp(distribution_bpx(generator), distribution_by(generator), -distribution_bv(generator));
