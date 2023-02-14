@@ -8,7 +8,7 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 # Dependencies
 
 ```bash
-git clone https://github.com/ThomasLeMezo/ipe_generator.git
+git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
 mkdir build
 cd build
