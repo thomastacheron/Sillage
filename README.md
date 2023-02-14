@@ -5,7 +5,7 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 
 ![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
 
-Replace ```cd <YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```.
+Replace ```<YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```.
 
 # Dependencies
 
