@@ -86,4 +86,5 @@ cd scripts
 ./video.bash ../output
 ```
 
-You will get ```<YOUR_PATH/Sillage/scripts/Wake.mp4```
+You will get ```<YOUR_PATH/Sillage/scripts/Wake.mp4```.
+You can watch it with ```vlc``` for example ```vlc <YOUR_PATH/Sillage/scripts/Wake.mp4```.
