@@ -87,4 +87,5 @@ cd scripts
 ```
 
 You will get ```<YOUR_PATH/Sillage/scripts/Wake.mp4```.
+
 You can watch it with ```vlc``` for example ```vlc <YOUR_PATH/Sillage/scripts/Wake.mp4```.
