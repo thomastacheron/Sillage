@@ -8,7 +8,7 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 # Dependencies
 
 ```bash
-sudo apt install libipe-dev
+sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
 git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
 mkdir build
