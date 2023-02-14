@@ -1,7 +1,7 @@
 # Sillage
 Boat localisation using wake and interval analysis. Last year application project at Guerlédan Lake.
 
-This is a test of Teusner/WakeBoat project for boat localisation, using true detections with two buoys.
+This is a test of https://github.com/Teusner/WakeBoat project for boat localisation, using true detections with two buoys.
 
 ![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
 
