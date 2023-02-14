@@ -5,16 +5,19 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 
 ![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
 
+This repository implement the boat localisation given the wakes detected. To detect the wakes see [this repository](https://github.com/Pazu35/sillage).
+# User manual
+
 Replace ```<YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```.
 
-# Dependencies
+## Dependencies
 
-## Libraries
+### Libraries
 ```bash
 sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
 ```
 
-## ipe_generator
+### ipe_generator
 ```bash
 cd <YOUR_PATH>
 git clone https://github.com/thomastacheron/ipe_generator.git
@@ -26,7 +29,7 @@ make -j8
 sudo make install
 ```
 
-## fmt
+### fmt
 ```bash
 cd <YOUR_PATH>
 git clone https://github.com/fmtlib/fmt.git
@@ -38,7 +41,7 @@ make -j8
 sudo make install
 ```
 
-# Install
+## Install
 
 ```bash
 cd <YOUR_PATH>
@@ -50,7 +53,7 @@ cmake ..
 make -j8
 ```
 
-# Setup
+## Setup
 
 ```bash
 cd <YOUR_PATH>/Sillage
@@ -58,7 +61,7 @@ git submodule init
 git submodule update
 ```
 
-# Generate .ipe files
+## Generate .ipe files
 ```bash
 cd <YOUR_PATH>/Sillage
 mkdir output
@@ -68,17 +71,19 @@ make -j8
 ./main --path=../output
 ```
 
-# Generate .png images
+## Generate .png images
 ```bash
 cd <YOUR_PATH>/Sillage
 cd scripts
 ./ipe_convert.bash ../output
 ```
 
-# Generate .mp4 video
+## Generate .mp4 video
 ```bash
 cd <YOUR_PATH>/Sillage
 cd scripts
 ./ipe_convert.bash ../output
 ./video.bash ../output
 ```
+
+You will get ```<YOUR_PATH/Sillage/scripts/Wake.mp4```
