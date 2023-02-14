@@ -5,8 +5,6 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 
 ![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
 
-# Install
-
 # Dependencies
 
 ```bash
@@ -19,6 +17,8 @@ cmake ..
 make -j8
 sudo make install
 ```
+
+# Install
 
 ```bash
 git clone https://github.com/thomastacheron/Sillage.git
