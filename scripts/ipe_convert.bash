@@ -10,7 +10,7 @@ for f in ${1}/*; do
         if [ ! -f ${1}/png/${fileradical}.png ]
         then
             echo ${fileradical}
-            iperender -png -resolution 1300 ${1}/${filename} ${1}/png/${fileradical}.png
+            iperender -png -resolution 300 ${1}/${filename} ${1}/png/${fileradical}.png
         fi
     fi
 done

@@ -48,16 +48,6 @@ include_directories(${fmt_INCLUDE_DIRS})
 add_subdirectory(extern/cxxopts)
 
 ################################################################################
-# Looking for ryml
-################################################################################
-find_package(ryml REQUIRED)
-
-################################################################################
-# Looking for Poisson-Disk-Generator
-################################################################################
-include_directories(extern/poisson-disk-generator)
-
-################################################################################
 # Looking for THREADS
 ################################################################################
 find_package (Threads)
@@ -71,6 +61,6 @@ target_link_libraries(wake_boat ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIB
 
 add_executable(main src/main.cpp)
 target_include_directories(main PUBLIC cxxopts)
-target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt cxxopts ${CMAKE_THREAD_LIBS_INIT} wake_boat ryml::ryml)
+target_link_libraries(main ${CODAC_LIBRARIES} Ibex::ibex ${IPEGENERATOR_LIBRARIES} fmt::fmt cxxopts ${CMAKE_THREAD_LIBS_INIT} wake_boat)
 
 # add_subdirectory(test)

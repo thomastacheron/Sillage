@@ -20,10 +20,10 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include <ryml_std.hpp>
-#include <ryml.hpp>
+// #include <ryml_std.hpp>
+// #include <ryml.hpp>
 
-#include "PoissonGenerator.h"
+// #include "PoissonGenerator.h"
 
 using namespace std;
 
@@ -41,16 +41,33 @@ void draw_ipe(double t, double tmin, double tmax, double h, Scene &scene, std::m
     scene.boat_space(M, fig, t);
     fig.draw_axis("x","y");
     fig.reset_attribute();
-    fig.draw_text(fmt::format("{0:.2f} s", t), -2, 100*X[1].diam()/(2*X[0].diam()) - 9, true, ipe::EAlignLeft);
+    fig.draw_text(fmt::format("{0:.2f} s", t), -2, 100*X[1].diam()/(2*X[0].diam()) - 6, true, ipe::EAlignLeft);
     fig.save_ipe(filename + ".ipe");
 }
+
+struct latlon{
+    float lat;
+    float lon;
+};
+
+struct local{
+    float x;
+    float y;
+};
+
+void latlon2local(const latlon& pos0, const latlon& pos, local& loc){
+    float rho = 6371009; //m
+    loc.x = rho*cos(pos.lat*M_PI/180)*(pos.lon - pos0.lon)*M_PI/180;
+    loc.y = rho*(pos.lat - pos0.lat)*M_PI/180;
+}
+
 
 int main(int argc, char *argv[]) {
     // Parsing args
     cxxopts::Options options("05-video", "Video generation of boat's enclosing state using sensors");
 
     options.add_options()
-        ("c,config", "Configuration file", cxxopts::value<std::string>())
+        // ("c,config", "Configuration file", cxxopts::value<std::string>())
         ("p,path", "Output path", cxxopts::value<std::string>()->default_value(""))
         ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
         ("h,help", "Print usage")
@@ -64,47 +81,20 @@ int main(int argc, char *argv[]) {
 
     bool verbose = result["verbose"].as<bool>();
 
-    std::filesystem::path p(result["config"].as<std::string>());
-    if (!std::filesystem::exists(p)) {
-        fmt::print(stderr, "The provided path does not point to config file !");
-        std::exit(EXIT_FAILURE);
-    }
-
-    std::ifstream stream(p.c_str(), std::ios::binary);
-    std::stringstream buffer;
-    buffer << stream.rdbuf();
-    ryml::Tree tree = ryml::parse_in_arena(ryml::to_csubstr((buffer.str()).c_str()));
-    ryml::NodeRef root = tree.rootref();
-
+    
     // Causal
     bool causal = false;
-    if (root["causal"].is_keyval()) {
-        root["causal"] >> causal;
-    }
-
+    
     // Precision
-    double precision;
-    if (root["precision"].is_keyval()) {
-        root["precision"] >> precision;
-    }
-    else {
-        fmt::print(stderr, "No provided precision !");
-        std::exit(EXIT_FAILURE);
-    }
+    double precision = 0.05;
 
     // Boat space
     codac::IntervalVector X0(3);
     std::vector<std::string> state{"x", "y", "v"};
-    std::for_each(state.cbegin(), state.cend(),
-        [&X0, &root, i=0](std::string s) mutable {
-            if (root[ryml::to_csubstr(s)].is_seq()) {
-                double lb, ub;
-                root[ryml::to_csubstr(s)][0] >> lb;
-                root[ryml::to_csubstr(s)][1] >> ub;
-                X0[i] = codac::Interval(lb, ub);
-            }
-            ++i;
-        });
+
+    X0[0] = codac::Interval(-5,70);
+    X0[1] = codac::Interval(-25,25);
+    X0[2] = codac::Interval(5, 12);
 
     if (X0[2].lb() <= 0) {
         fmt::print(stderr, "The minimal velocity should be strictly positive !");
@@ -112,45 +102,15 @@ int main(int argc, char *argv[]) {
     }
 
     // Time
-    double tmin;
-    double tmax;
-    if (root["t"].is_seq()) {
-        root["t"][0] >> tmin;
-        root["t"][1] >> tmax;
-    }
-    else {
-        fmt::print(stderr, "No provided time data !");
-        std::exit(EXIT_FAILURE);
-    }
+    double tmin=0.;
+    double tmax=28.; // CHANGER
 
-    double h;
-    if (root["h"].is_keyval()) {
-        root["h"] >> h;
-    }
-    else {
-        fmt::print(stderr, "No provided time step !");
-        std::exit(EXIT_FAILURE);
-    }
-
+    double h = 1./30.;
     // Boats
-    std::size_t n_boats;
-    if (root["n_boats"].is_keyval()) {
-        root["n_boats"] >> n_boats;
-    }
-    else {
-        fmt::print(stderr, "No provided number of boats !");
-        std::exit(EXIT_FAILURE);
-    }
+    std::size_t n_boats=1;
 
     // Sensors
-    std::size_t n_sensors;
-    if (root["n_sensors"].is_keyval()) {
-        root["n_sensors"] >> n_sensors;
-    }
-    else {
-        fmt::print(stderr, "No provided number of sensors !");
-        std::exit(EXIT_FAILURE);
-    }
+    std::size_t n_sensors=4;
 
     // Path
     std::string path;
@@ -158,9 +118,6 @@ int main(int argc, char *argv[]) {
 
     if (!result["path"].as<std::string>().empty()) {
         path = result["path"].as<std::string>();
-    }
-    else if (root["path"].is_keyval()) {
-        root["path"] >> path;
     }
     else {
         fmt::print(stderr, "No provided output directory !");
@@ -188,29 +145,32 @@ int main(int argc, char *argv[]) {
 
     // Boats
     std::vector<Boat> boats;
-
-    std::uniform_real_distribution<double> distribution_bnx(X0[0].lb()-5, X0[0].lb());
-    std::uniform_real_distribution<double> distribution_bpx(X0[0].ub(), X0[0].ub()+5);
-    std::uniform_real_distribution<double> distribution_by(0.8*X0[1].lb(), 0.8*X0[1].ub());
-    std::uniform_real_distribution<double> distribution_bv(X0[2].lb()+0.1*X0[2].diam(), X0[2].ub()-0.1*X0[2].diam());
-    for (int i=0; i<n_boats; ++i) {
-        Boat bn(distribution_bnx(generator), distribution_by(generator), distribution_bv(generator));
-        Boat bp(distribution_bpx(generator), distribution_by(generator), -distribution_bv(generator));
-        boats.push_back(bn);
-        boats.push_back(bp);
-    }
-
+    Boat bn(0, 0, 8);
+    boats.push_back(bn);
     // Sensors
-    PoissonGenerator::DefaultPRNG PRNG;
-    const auto Points = PoissonGenerator::generatePoissonPoints(n_sensors, PRNG, false);
     std::vector<Sensor> sensors;
-    for (auto i = Points.begin(); i != Points.end(); i++) {
-        double x = i->x * X0[0].diam() + X0[0].lb();
-        double y = i->y * X0[1].diam() + X0[1].lb();
-        Sensor s(x, y);
-        sensors.push_back(s);
-    }
-
+    latlon g1, g2, g3, g4;
+    g1.lat = 48.198315;
+    g1.lon = -3.01888;
+    g2.lat = 48.198315;
+    g2.lon = -3.01888;
+    g3.lat = 48.19799833333333;
+    g3.lon = -3.01895;
+    g4.lat = 48.19799833333333;
+    g4.lon = -3.01895;
+    local l1, l2, l3, l4;
+    latlon2local(g1, g1, l1);
+    latlon2local(g1, g2, l2);
+    latlon2local(g1, g3, l3);
+    latlon2local(g1, g4, l4);
+    Sensor s1((l1.x) * cos((180-39)*M_PI/180.) - (l1.y) * sin((180-39)*M_PI/180.) + 6, (l1.x + 5) * sin((180-39)*M_PI/180.) + (l1.y + 5) * cos((180-39)*M_PI/180.)  - 20);
+    Sensor s2((l2.x) * cos((180-39)*M_PI/180.) - (l2.y) * sin((180-39)*M_PI/180.) + 6, (l2.x + 5) * sin((180-39)*M_PI/180.) + (l2.y + 5) * cos((180-39)*M_PI/180.)  - 20);
+    Sensor s3((l3.x) * cos((180-39)*M_PI/180.) - (l3.y) * sin((180-39)*M_PI/180.) + 6, (l3.x + 5) * sin((180-39)*M_PI/180.) + (l3.y + 5) * cos((180-39)*M_PI/180.)  - 20);
+    Sensor s4((l4.x) * cos((180-39)*M_PI/180.) - (l4.y) * sin((180-39)*M_PI/180.) + 6, (l4.x + 5) * sin((180-39)*M_PI/180.) + (l4.y + 5) * cos((180-39)*M_PI/180.)  - 20);
+    sensors.push_back(s1);
+    sensors.push_back(s2);
+    sensors.push_back(s3);
+    sensors.push_back(s4);
     // Tread Pool
     std::size_t n = std::thread::hardware_concurrency();
     ThreadPool pool(n);
@@ -227,8 +187,10 @@ int main(int argc, char *argv[]) {
             pool.enqueue(std::bind(&Scene::solve, &scene, t, precision, causal))
         );
     }
-
+    size_t c = 0;
     for(auto && result: results) {
+        std::cout << c << "\n";
+        c++;
         std::pair<double,std::map<codac::SetValue,std::list<codac::IntervalVector>>> p = result.get();
         draw_ipe(p.first, tmin, tmax, h, scene, p.second, X0, output_directory, verbose);
     }

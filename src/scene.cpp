@@ -94,16 +94,19 @@ double Scene::t_min() {
 
 void Scene::process() {
     std::lock_guard<std::mutex> guard(m_mutex);
+    size_t c = 0;
     for (auto &s : m_sensors) {
         s.t.clear();
-        for (const auto &b: m_boats) {
-            // Detection Interval
-            double t = 1 / b.V() * (sgn(b.V()) * std::abs(b.Y() - s.Y()) / std::tan(19.5 * M_PI / 180.) - (b.X() - s.X()));
-            codac::Interval I(t);
-            I.inflate(0.5);
-            s.t.push_back(I);
+        if (c < 2){
+            codac::Interval I1(0.0 +4,9.525000000001455 +4);
+            s.t.push_back(I1);
         }
-    }
+        if (c > 1){
+            codac::Interval I1(0.0 +4,3. +4);
+            s.t.push_back(I1);
+        }
+        c++;
+        }
     m_dirty = false;
 }
 
