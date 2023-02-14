@@ -9,12 +9,12 @@ Replace ```cd <YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```
 
 # Dependencies
 
-Libraries
+## Libraries
 ```bash
 sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
 ```
 
-ipe_generator
+## ipe_generator
 ```bash
 git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
@@ -25,7 +25,7 @@ make -j8
 sudo make install
 ```
 
-fmt
+## fmt
 ```bash
 cd <YOUR_PATH>
 git clone https://github.com/fmtlib/fmt.git
