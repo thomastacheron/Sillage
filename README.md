@@ -5,12 +5,31 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 
 ![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
 
+Replace ```cd <YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```.
+
 # Dependencies
 
+Libraries
 ```bash
 sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
+```
+
+ipe_generator
+```bash
 git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
+mkdir build
+cd build
+cmake ..
+make -j8
+sudo make install
+```
+
+fmt
+```bash
+cd <YOUR_PATH>
+git clone https://github.com/fmtlib/fmt.git
+cd fmt
 mkdir build
 cd build
 cmake ..
@@ -21,6 +40,7 @@ sudo make install
 # Install
 
 ```bash
+cd <YOUR_PATH>
 git clone https://github.com/thomastacheron/Sillage.git
 cd Sillage
 mkdir build
