@@ -12,6 +12,10 @@ Replace ```<YOUR_PATH>``` with the path of your choice e.g. ```~/Documents```.
 
 ## Dependencies
 
+### Codac
+
+[codac.io](https://codac.io/)
+
 ### Libraries
 ```bash
 sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
