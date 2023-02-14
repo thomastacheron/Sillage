@@ -16,6 +16,7 @@ sudo apt install libipe-dev libpng-dev libjpeg-dev libspiro-dev
 
 ## ipe_generator
 ```bash
+cd <YOUR_PATH>
 git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
 mkdir build
