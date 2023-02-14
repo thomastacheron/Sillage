@@ -7,18 +7,10 @@ This is a test of https://github.com/Teusner/WakeBoat project for boat localisat
 
 # Install
 
-```bash
-git clone https://github.com/thomastacheron/Sillage.git
-cd Sillage
-mkdir build
-cd build
-cmake ..
-make -j8
-```
-
 # Dependencies
 
 ```bash
+sudo apt install libipe-dev
 git clone https://github.com/thomastacheron/ipe_generator.git
 cd ipe_generator
 mkdir build
@@ -26,6 +18,15 @@ cd build
 cmake ..
 make -j8
 sudo make install
+```
+
+```bash
+git clone https://github.com/thomastacheron/Sillage.git
+cd Sillage
+mkdir build
+cd build
+cmake ..
+make -j8
 ```
 
 # Setup
