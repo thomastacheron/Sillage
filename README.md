@@ -3,7 +3,7 @@ Boat localisation using wake and interval analysis. Last year application projec
 
 This is a test of https://github.com/Teusner/WakeBoat project for boat localisation, using true detections with two buoys.
 
-![out](https://user-images.githubusercontent.com/114411509/218680032-6cc96afe-0677-40e0-886c-70fd600703ae.gif)
+![out](https://user-images.githubusercontent.com/114411509/219663657-782d7d27-2bdf-4142-9878-09dde1b8592b.gif)
 
 This repository implement the boat localisation given the wakes detected. To detect the wakes see [this repository](https://github.com/Pazu35/sillage).
 # User manual
@@ -51,18 +51,12 @@ sudo make install
 cd <YOUR_PATH>
 git clone https://github.com/thomastacheron/Sillage.git
 cd Sillage
+git submodule init
+git submodule update
 mkdir build
 cd build
 cmake ..
 make -j8
-```
-
-## Setup
-
-```bash
-cd <YOUR_PATH>/Sillage
-git submodule init
-git submodule update
 ```
 
 ## Generate .ipe files
