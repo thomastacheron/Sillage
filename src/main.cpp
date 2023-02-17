@@ -23,7 +23,7 @@
 // #include <ryml_std.hpp>
 // #include <ryml.hpp>
 
-// #include "PoissonGenerator.h"
+#include "PoissonGenerator.h"
 
 using namespace std;
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
     // Time
     double tmin=0.;
-    double tmax=28.; // CHANGER
+    double tmax=11.; // CHANGER
 
     double h = 1./30.;
     // Boats
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
     // Boats
     std::vector<Boat> boats;
-    Boat bn(0, 0, 8);
+    Boat bn(0, 0, 9);
     boats.push_back(bn);
     // Sensors
     std::vector<Sensor> sensors;
@@ -163,10 +163,10 @@ int main(int argc, char *argv[]) {
     latlon2local(g1, g2, l2);
     latlon2local(g1, g3, l3);
     latlon2local(g1, g4, l4);
-    Sensor s1((l1.x) * cos((180-39)*M_PI/180.) - (l1.y) * sin((180-39)*M_PI/180.) + 6, (l1.x + 5) * sin((180-39)*M_PI/180.) + (l1.y + 5) * cos((180-39)*M_PI/180.)  - 20);
-    Sensor s2((l2.x) * cos((180-39)*M_PI/180.) - (l2.y) * sin((180-39)*M_PI/180.) + 6, (l2.x + 5) * sin((180-39)*M_PI/180.) + (l2.y + 5) * cos((180-39)*M_PI/180.)  - 20);
-    Sensor s3((l3.x) * cos((180-39)*M_PI/180.) - (l3.y) * sin((180-39)*M_PI/180.) + 6, (l3.x + 5) * sin((180-39)*M_PI/180.) + (l3.y + 5) * cos((180-39)*M_PI/180.)  - 20);
-    Sensor s4((l4.x) * cos((180-39)*M_PI/180.) - (l4.y) * sin((180-39)*M_PI/180.) + 6, (l4.x + 5) * sin((180-39)*M_PI/180.) + (l4.y + 5) * cos((180-39)*M_PI/180.)  - 20);
+    Sensor s1((l1.x) * cos((180-39)*M_PI/180.) - (l1.y) * sin((180-39)*M_PI/180.) + 6, (l1.x + 5) * sin((180-39)*M_PI/180.) + (l1.y + 5) * cos((180-39)*M_PI/180.)  - 15);
+    Sensor s2((l2.x) * cos((180-39)*M_PI/180.) - (l2.y) * sin((180-39)*M_PI/180.) + 6, (l2.x + 5) * sin((180-39)*M_PI/180.) + (l2.y + 5) * cos((180-39)*M_PI/180.)  - 15);
+    Sensor s3((l3.x) * cos((180-39)*M_PI/180.) - (l3.y) * sin((180-39)*M_PI/180.) + 6, (l3.x + 5) * sin((180-39)*M_PI/180.) + (l3.y + 5) * cos((180-39)*M_PI/180.)  - 15);
+    Sensor s4((l4.x) * cos((180-39)*M_PI/180.) - (l4.y) * sin((180-39)*M_PI/180.) + 6, (l4.x + 5) * sin((180-39)*M_PI/180.) + (l4.y + 5) * cos((180-39)*M_PI/180.)  - 15);
     sensors.push_back(s1);
     sensors.push_back(s2);
     sensors.push_back(s3);

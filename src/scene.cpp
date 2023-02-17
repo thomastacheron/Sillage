@@ -98,12 +98,16 @@ void Scene::process() {
     for (auto &s : m_sensors) {
         s.t.clear();
         if (c < 2){
-            codac::Interval I1(0.0 +4,9.525000000001455 +4);
+            codac::Interval I1(0.0 + 4, 2.3 + 4);
+            // codac::Interval I2(5.9 + 4, 9.7 + 4);
             s.t.push_back(I1);
+            // s.t.push_back(I2);
         }
         if (c > 1){
-            codac::Interval I1(0.0 +4,3. +4);
+            codac::Interval I1(0.0 + 4, 3. + 4);
+            // codac::Interval I2(5.2 + 4, 10.2 + 4);
             s.t.push_back(I1);
+            // s.t.push_back(I2);
         }
         c++;
         }
